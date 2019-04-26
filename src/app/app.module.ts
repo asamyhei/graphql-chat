@@ -1,18 +1,37 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {BrowserModule} from '@angular/platform-browser';
+import {NgModule} from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import {AppRoutingModule} from './app-routing.module';
+import {AppComponent} from './app.component';
+import {GraphqlModule} from './grapql/graphql.module';
+import {HttpClientModule} from '@angular/common/http';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {MessageComponent} from './chat/message/message.component';
+import {ScrollingModule} from '@angular/cdk/scrolling';
+import {ScrollingModule as ExperimentalScrollingModule} from '@angular/cdk-experimental/scrolling';
+import {LoginComponent} from './login/login.component';
+import {ChatComponent} from './chat/chat.component';
+import {ConversationComponent} from './chat/conversation/conversation.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    MessageComponent,
+    LoginComponent,
+    ChatComponent,
+    ConversationComponent
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    GraphqlModule,
+    HttpClientModule,
+    BrowserAnimationsModule,
+    ScrollingModule,
+    ExperimentalScrollingModule
   ],
   providers: [],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}

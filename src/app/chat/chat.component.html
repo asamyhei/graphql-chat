@@ -1,0 +1,32 @@
+<div class="h-100 d-flex flex-row container-fluid row w-100">
+  <div class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block">
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+    <app-conversation></app-conversation>
+  </div>
+
+  <div class="col h-100">
+    <div #scrollContainer class="col overflow-auto no-scrollbar" style="height: 83% !important;">
+      <app-message></app-message>
+    </div>
+    <div class="py-4 bg-white">
+      <div class="row mx-5">
+        <div class="col d-flex">
+          <label class="w-100">
+            <input #inputElement (keyup.enter)="sendMessage(inputElement)" class="form-control" placeholder="Entrer le message"
+                   type="text">
+          </label>
+          <button (click)="sendMessage(inputElement)" class="btn"><i class="material-icons">send</i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+mutation addUser($name: String!){
+  addUser(name: $name) {
+    id
+    name
+    picture_url
+  }
+}
+
+mutation addMessage($content: String!, $userId: ID!) {
+  addMessage(content: $content, userId: $userId) {
+    content
+    timestamp
+  }
+}
+
+query messages {
+  messages {
+    content
+    timestamp
+    user {
+      id
+      name
+      picture_url
+    }
+  }
+}
+
+subscription messageAdded{
+  messageAdded {
+    id
+    content
+    timestamp
+    user {
+      id
+      name
+      picture_url
+    }
+  }
+}
+
+subscription userJoined {
+  userConnected {
+    id
+    name
+    picture_url
+  }
+}
