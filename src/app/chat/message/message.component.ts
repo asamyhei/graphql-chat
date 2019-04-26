@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {Message, MessageAddedGQL, User} from '../../grapql/generated/graphql';
+import {Message, MessageAddedGQL, User} from '../../graphql/generated/graphql';
 import {map} from 'rxjs/operators';
 
 @Component({

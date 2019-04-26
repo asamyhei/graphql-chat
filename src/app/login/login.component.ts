@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {map} from 'rxjs/operators';
-import {AddUserGQL, User} from '../grapql/generated/graphql';
+import {AddUserGQL, User} from '../graphql/generated/graphql';
 import {Router} from '@angular/router';
 
 @Component({

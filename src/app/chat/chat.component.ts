@@ -1,5 +1,5 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {AddMessageGQL, User} from '../grapql/generated/graphql';
+import {AddMessageGQL, User} from '../graphql/generated/graphql';
 
 @Component({
   selector: 'app-chat',

@@ -32,7 +32,7 @@ app.get("/*", function(req, res) {
 // Start the app by listening on the default Heroku port
 const ws = createServer(app);
 ws.listen(process.env.PORT || 8080, () => {
-  console.log(`GraphQL Server is now running on http://localhost:${process.env.PORT || 4000}`);
+  console.log(`GraphQL Server is now running on http://localhost:${process.env.PORT || 8080}`);
 
   // Set up the WebSocket for handling GraphQL subscriptions.
   new SubscriptionServer({

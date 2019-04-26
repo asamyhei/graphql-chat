@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {User} from '../../grapql/generated/graphql';
+import {User} from '../../graphql/generated/graphql';
 
 @Component({
   selector: 'app-conversation',
