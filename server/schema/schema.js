@@ -3,6 +3,7 @@ const {find, filter} = require("lodash");
 const {makeExecutableSchema} = require("graphql-tools");
 const User = require("../models/user");
 const Message = require("../models/message");
+const Conversation = require("../models/conversation");
 const {PubSub} = require("graphql-subscriptions");
 const {DateTime} = require("@okgrow/graphql-scalars");
 
@@ -19,6 +20,7 @@ const typeDefs = gql`
     name: String
     picture_url: String
     messages: [Message]
+    conversations: [Conversation]
   }
 
   type Message {
@@ -32,9 +34,12 @@ const typeDefs = gql`
   type Conversation {
     id: ID!
     users: [User]
+    messages: [Message]
   }
 
   type Query {
+    conversation(id: ID!): Conversation
+    conversations: [Conversation]
     user(id: ID!): User
     users: [User]
     message(id: ID!): Message
@@ -56,6 +61,31 @@ const resolvers = {
   DateTime,
   Mutation: {
     addMessage: (parent, args) => {
+
+
+      let user = User.findById(args.userId);
+      user.conversationIds.push()
+
+      let isPresent = false;
+
+      let conversation = Conversation.find({userId: {$in: user.conversationIds}}, (err, docs) => {
+        console.log(docs)
+        isPresent = !!docs;
+      });
+
+      if (!isPresent) {
+        conversation = new Conversation({
+          userIds: [args.userId]
+        });
+      } else {
+        conversation.userIds.push(args.userId);
+      }
+
+      let conSaved = conversation.save();
+
+      user.conversationIds.push(conSaved.id);
+      user.save();
+
       let message = new Message({
         content: args.content,
         timestamp: Date.now(),
@@ -72,7 +102,7 @@ const resolvers = {
       let user = new User({
         name: args.name,
         picture_url: `https://api.adorable.io/avatars/35/${args.name}.png`,
-
+        conversationIds: []
       });
 
       let userSaved = user.save();
@@ -84,6 +114,8 @@ const resolvers = {
 
   },
   Query: {
+    conversation: (parent, args) => Conversation.find({}),
+    conversations: (parent, args) => Conversation.findById(args.id),
     message: (parent, args) => Message.findById(args.id),
     messages: () => Message.find({}),
     user: (parent, args) => User.findById(args.id),
@@ -99,11 +131,16 @@ const resolvers = {
 
   },
   User: {
+    conversations: (user) => Conversation.find({userId: {$in: user.conversationIds}}),
     messages: (user) => Message.find({userId: user.id}),
   },
   Message: {
     user: (message) => User.findById(message.userId),
   },
+  Conversation: {
+    users: (conversation) => User.find({conversationIds: {$in: conversation.userIds}}).toArray(),
+  },
+
 };
 
 module.exports = makeExecutableSchema({
