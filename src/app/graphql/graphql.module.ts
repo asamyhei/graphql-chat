@@ -15,12 +15,12 @@ import {getMainDefinition} from 'apollo-utilities';
 export class GraphqlModule {
   constructor(apollo: Apollo, private httpClient: HttpClient) {
     const httpLink = new HttpLink(httpClient).create({
-      uri: 'https://graphql-chat-server-aqwa.herokuapp.com/graphql'
+      uri: 'https://graphql-chat-node-angular.herokuapp.com//graphql'
     });
 
     const subscriptionLink = new WebSocketLink({
       uri:
-        'wss://graphql-chat-server-aqwa.herokuapp.com/graphql',
+        'wss://graphql-chat-node-angular.herokuapp.com//graphql',
       options: {
         reconnect: true,
         connectionParams: {
