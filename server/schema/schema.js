@@ -1,11 +1,11 @@
-const gql = require("graphql-tag");
-const {find, filter} = require("lodash");
-const {makeExecutableSchema} = require("graphql-tools");
 const User = require("../models/user");
 const Message = require("../models/message");
 const Conversation = require("../models/conversation");
+
+const gql = require("graphql-tag");
+const {makeExecutableSchema} = require("graphql-tools");
 const {PubSub} = require("graphql-subscriptions");
-const {DateTime} = require("@okgrow/graphql-scalars");
+const ObjectID = require('mongodb').ObjectID;
 
 const pubSub = new PubSub();
 const MESSAGE_ADDED = "newMessage";
@@ -39,16 +39,17 @@ const typeDefs = gql`
 
   type Query {
     conversation(id: ID!): Conversation
+    conversationsByUser(userId: ID!): [Conversation]
     conversations: [Conversation]
     user(id: ID!): User
     users: [User]
-    message(id: ID!): Message
     messages: [Message]
   }
 
   type Mutation {
     addUser(name: String!): User
-    addMessage(content: String!, userId: ID!): Message
+    addMessage(content: String!, userIds: [ID!]!, conversationId: ID): Message
+    addUserToConversation(userId: ID!, conversationId: ID!): User
   }
 
   type Subscription {
@@ -58,38 +59,51 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-  DateTime,
+  User: {
+    messages: (user) => Message.find({userId: user.id}),
+    conversations: (user) => Conversation.find({userIds: user.id})
+  },
+  Message: {
+    user: (message) => User.findById(message.userId),
+    conversation: (message) => Conversation.findById(message.conversationId)
+  },
+  Conversation: {
+    users: (conversation) => User.find({conversationIds: conversation.id}),
+    messages: (conversation) => Message.find({conversationId: conversation.id})
+  },
+
+  Query: {
+    conversations: (parent, args) => Conversation.find(),
+    conversation: (parent, args) => Conversation.findById(args.id),
+    conversationsByUser: (parent, args) => Conversation.find({userIds: args.userId}),
+    messages: () => Message.find({}),
+    user: (parent, args) => User.findById(args.id),
+    users: () => User.find({}),
+  },
+
   Mutation: {
-    addMessage: (parent, args) => {
+    addMessage: async (parent, args) => {
 
+      //Create conversation if not present
+      let convSaved;
 
-      let user = User.findById(args.userId);
-      user.conversationIds.push()
-
-      let isPresent = false;
-
-      let conversation = Conversation.find({userId: {$in: user.conversationIds}}, (err, docs) => {
-        console.log(docs)
-        isPresent = !!docs;
-      });
-
-      if (!isPresent) {
-        conversation = new Conversation({
-          userIds: [args.userId]
+      if (!args.conversationId) {
+        let conversation = new Conversation({
+          userIds: args.userIds
         });
-      } else {
-        conversation.userIds.push(args.userId);
+        convSaved = await conversation.save();
+
+        for (let userId of args.userIds) {
+          await User.updateOne({_id: userId}, {$push: {conversationIds: convSaved.id}});
+        }
       }
 
-      let conSaved = conversation.save();
-
-      user.conversationIds.push(conSaved.id);
-      user.save();
-
+      //Add message
       let message = new Message({
         content: args.content,
         timestamp: Date.now(),
         userId: args.userId,
+        conversationId: typeof args.conversationId === 'undefined' ? convSaved.id : args.conversationId
       });
 
       let messageSaved = message.save();
@@ -98,29 +112,27 @@ const resolvers = {
 
       return messageSaved;
     },
-    addUser: (parent, args) => {
+    addUser: async (parent, args) => {
       let user = new User({
         name: args.name,
         picture_url: `https://api.adorable.io/avatars/35/${args.name}.png`,
         conversationIds: []
       });
 
-      let userSaved = user.save();
+      let userSaved = await user.save();
 
       pubSub.publish(USER_CONNECTED, {userConnected: userSaved});
 
       return userSaved;
     },
+    addUserToConversation: async (parent, args) => {
+      Conversation.updateOne({_id: args.conversationId}, {$push: {userIds: args.userId}});
+      User.updateOne({_id: args.userId}, {$push: {conversationIds: args.conversationId}});
+      return User.findById(args.userId);
+    }
 
   },
-  Query: {
-    conversation: (parent, args) => Conversation.find({}),
-    conversations: (parent, args) => Conversation.findById(args.id),
-    message: (parent, args) => Message.findById(args.id),
-    messages: () => Message.find({}),
-    user: (parent, args) => User.findById(args.id),
-    users: () => User.find({}),
-  },
+
   Subscription: {
     messageAdded: {
       subscribe: () => pubSub.asyncIterator(MESSAGE_ADDED),
@@ -129,16 +141,6 @@ const resolvers = {
       subscribe: () => pubSub.asyncIterator(USER_CONNECTED),
     },
 
-  },
-  User: {
-    conversations: (user) => Conversation.find({userId: {$in: user.conversationIds}}),
-    messages: (user) => Message.find({userId: user.id}),
-  },
-  Message: {
-    user: (message) => User.findById(message.userId),
-  },
-  Conversation: {
-    users: (conversation) => User.find({conversationIds: {$in: conversation.userIds}}).toArray(),
   },
 
 };

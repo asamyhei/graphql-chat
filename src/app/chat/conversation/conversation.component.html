@@ -1,9 +1,9 @@
-<div class="row">
+<div class="row" (click)="logConversation()" style="cursor: pointer">
   <div class="col d-flex align-items-center py-2 border border-bottom-0 border-right-0 flex-row">
-    <img [src]="user.picture_url" alt="profile_picture" style="border-radius: 50%">
+    <img [src]="userImage" alt="profile_picture" style="border-radius: 50%">
     <div>
       <div class="mx-3">Conv name:</div>
-      <div class="mx-3 font-weight-light">Last message</div>
+      <div class="mx-3 font-weight-light">{{conversation.messages[conversation.messages.length -1]}}</div>
     </div>
   </div>
 </div>

@@ -12,6 +12,7 @@ import {ScrollingModule as ExperimentalScrollingModule} from '@angular/cdk-exper
 import {LoginComponent} from './login/login.component';
 import {ChatComponent} from './chat/chat.component';
 import {ConversationComponent} from './chat/conversation/conversation.component';
+import {ReactiveFormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -28,7 +29,8 @@ import {ConversationComponent} from './chat/conversation/conversation.component'
     HttpClientModule,
     BrowserAnimationsModule,
     ScrollingModule,
-    ExperimentalScrollingModule
+    ExperimentalScrollingModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

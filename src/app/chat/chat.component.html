@@ -1,16 +1,9 @@
 <div class="h-100 d-flex flex-row container-fluid row w-100">
-  <div class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block">
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
-    <app-conversation></app-conversation>
+  <div class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block resizable">
+    <div class="row my-1 mx-2">
+      <input type="search" class="form-control rounded-pill" placeholder="Rechercher conversation" (keyup)="updateName($event)">
+    </div>
+    <app-conversation *ngFor="let conv of user.conversations" [conversation] = conv ></app-conversation>
   </div>
 
   <div class="col h-100">
@@ -21,7 +14,8 @@
       <div class="row mx-5">
         <div class="col d-flex">
           <label class="w-100">
-            <input #inputElement (keyup.enter)="sendMessage(inputElement)" class="form-control" placeholder="Entrer le message"
+            <input #inputElement (keyup.enter)="sendMessage(inputElement)" class="form-control"
+                   placeholder="Entrer le message"
                    type="text">
           </label>
           <button (click)="sendMessage(inputElement)" class="btn"><i class="material-icons">send</i></button>

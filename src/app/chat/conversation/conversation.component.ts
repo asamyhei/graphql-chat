@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {User} from '../../graphql/generated/graphql';
+import {Component, Input, OnInit} from '@angular/core';
+import {Conversation, User} from '../../graphql/generated/graphql';
 
 @Component({
   selector: 'app-conversation',
@@ -7,7 +7,10 @@ import {User} from '../../graphql/generated/graphql';
   styleUrls: ['./conversation.component.scss']
 })
 export class ConversationComponent implements OnInit {
+
   user: User = JSON.parse(sessionStorage.getItem('user'));
+  @Input() conversation: Conversation;
+  userImage: string = this.conversation.users.find(user => user.id !== this.user.id).picture_url;
 
   constructor() {
   }
@@ -15,4 +18,7 @@ export class ConversationComponent implements OnInit {
   ngOnInit() {
   }
 
+  logConversation() {
+    console.log("conversation");
+  }
 }

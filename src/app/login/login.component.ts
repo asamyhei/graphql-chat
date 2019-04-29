@@ -29,6 +29,7 @@ export class LoginComponent implements OnInit {
         this.user = data;
         sessionStorage.setItem('user', JSON.stringify(this.user));
         this.route.navigate(['/chat']);
+        console.log(this.user);
       });
   }
 }
