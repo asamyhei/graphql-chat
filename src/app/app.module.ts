@@ -13,6 +13,7 @@ import {LoginComponent} from './login/login.component';
 import {ChatComponent} from './chat/chat.component';
 import {ConversationComponent} from './chat/conversation/conversation.component';
 import {ReactiveFormsModule} from '@angular/forms';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -30,7 +31,8 @@ import {ReactiveFormsModule} from '@angular/forms';
     BrowserAnimationsModule,
     ScrollingModule,
     ExperimentalScrollingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgbModule
   ],
   providers: [],
   bootstrap: [AppComponent]

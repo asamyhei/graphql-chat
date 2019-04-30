@@ -40,6 +40,7 @@ const typeDefs = gql`
   type Query {
     conversation(id: ID!): Conversation
     conversationsByUser(userId: ID!): [Conversation]
+    conversationsByUsers(userIds: [ID!]!): [Conversation]
     conversations: [Conversation]
     user(id: ID!): User
     users: [User]
@@ -48,8 +49,9 @@ const typeDefs = gql`
 
   type Mutation {
     addUser(name: String!): User
-    addMessage(content: String!, userIds: [ID!]!, conversationId: ID): Message
+    addMessage(content: String!, userIds: [ID!]!, conversationId: ID!): Message
     addUserToConversation(userId: ID!, conversationId: ID!): User
+    createConversation(userIds: [ID!]!): Conversation
   }
 
   type Subscription {
@@ -76,6 +78,7 @@ const resolvers = {
     conversations: (parent, args) => Conversation.find(),
     conversation: (parent, args) => Conversation.findById(args.id),
     conversationsByUser: (parent, args) => Conversation.find({userIds: args.userId}),
+    conversationsByUsers: (parent, args) => Conversation.find({userIds: {$all: args.userIds}}),
     messages: () => Message.find({}),
     user: (parent, args) => User.findById(args.id),
     users: () => User.find({}),
@@ -84,26 +87,12 @@ const resolvers = {
   Mutation: {
     addMessage: async (parent, args) => {
 
-      //Create conversation if not present
-      let convSaved;
-
-      if (!args.conversationId) {
-        let conversation = new Conversation({
-          userIds: args.userIds
-        });
-        convSaved = await conversation.save();
-
-        for (let userId of args.userIds) {
-          await User.updateOne({_id: userId}, {$push: {conversationIds: convSaved.id}});
-        }
-      }
-
       //Add message
       let message = new Message({
         content: args.content,
         timestamp: Date.now(),
         userId: args.userId,
-        conversationId: typeof args.conversationId === 'undefined' ? convSaved.id : args.conversationId
+        conversationId: args.conversationId
       });
 
       let messageSaved = message.save();
@@ -129,8 +118,34 @@ const resolvers = {
       Conversation.updateOne({_id: args.conversationId}, {$push: {userIds: args.userId}});
       User.updateOne({_id: args.userId}, {$push: {conversationIds: args.conversationId}});
       return User.findById(args.userId);
-    }
+    },
+    createConversation: async (parent, args) => {
 
+
+      let convSaved = null;
+
+      let result = await Conversation.find({userIds: {$all: args.userIds}});/*, (err, res) => {
+        convSaved = res[0];
+      });*/
+
+      console.log(result);
+
+
+      if (result && result.length > 0) {
+        console.log("conv" + JSON.stringify(result));
+        return result[0];
+      } else {
+        let conversation = new Conversation({
+          userIds: args.userIds
+        });
+        convSaved = await conversation.save();
+
+        for (let userId of args.userIds) {
+          await User.updateOne({_id: userId}, {$push: {conversationIds: convSaved.id}});
+        }
+        return convSaved;
+      }
+    }
   },
 
   Subscription: {

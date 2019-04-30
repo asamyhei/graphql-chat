@@ -10,7 +10,7 @@ const mongoose = require("mongoose");
 const {execute, subscribe} = require("graphql");
 const {createServer} = require("http");
 const {SubscriptionServer} = require("subscriptions-transport-ws");
-const uri = "mongodb+srv://arthur:Aqwarium1@cluster0-10jva.mongodb.net/gql-chat?retryWrites=true";
+const uri = "mongodb+srv://arthur:Aqwarium1@cluster0-10jva.mongodb.net/chat?retryWrites=true";
 
 app.use(cors());
 
