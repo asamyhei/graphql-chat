@@ -1,7 +1,14 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 import {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import {AddMessageGQL, Conversation, CreateConversationGQL, User, UsersGQL} from '../graphql/generated/graphql';
+import {
+  AddMessageGQL,
+  Conversation,
+  CreateConversationGQL,
+  User,
+  UserGQL,
+  UsersGQL
+} from '../graphql/generated/graphql';
 import {Observable} from 'rxjs';
 
 @Component({
@@ -11,7 +18,8 @@ import {Observable} from 'rxjs';
 })
 export class ChatComponent implements OnInit, AfterViewChecked {
 
-  user: User = JSON.parse(sessionStorage.getItem('user'));
+  user: User;
+  userId: string = sessionStorage.getItem('userId');
   users: User[] = [];
   currentConversation: Conversation;
 
@@ -19,15 +27,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
   constructor(private addMessageGQL: AddMessageGQL,
               private usersGQL: UsersGQL,
+              private userGQL: UserGQL,
               private createConversationGQL: CreateConversationGQL) {
-
-    this.usersGQL.watch().valueChanges
-      .pipe(
-        map(response => response.data.users))
-      .subscribe(data => {
-          this.users = data.filter(user => user.id !== this.user.id);
-        }
-      );
   }
 
   formatter = (result: User) => result.name;
@@ -41,6 +42,21 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     );
 
   ngOnInit() {
+
+    this.userGQL
+      .watch({id: sessionStorage.getItem('userId')}).valueChanges
+      .pipe(map(response => response.data.user))
+      .subscribe(user => this.user = user);
+
+    this.usersGQL
+      .watch().valueChanges
+      .pipe(
+        map(response => response.data.users))
+      .subscribe(data => {
+          this.users = data.filter(user => user.id !== this.userId);
+        }
+      );
+
     this.scrollToBottom();
   }
 
@@ -59,15 +75,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     this.addMessageGQL.mutate({
       content: inputElement.value,
-      userIds: [this.user.id],
-      conversationIds: this.currentConversation.id
+      userId: this.userId,
+      conversationId: this.currentConversation.id
     }).subscribe().unsubscribe();
 
     inputElement.value = '';
   }
 
   userSelected($event: NgbTypeaheadSelectItemEvent) {
-    let uId = [$event.item.id, this.user.id];
+    let uId = [$event.item.id, this.userId];
 
     this.createConversationGQL
       .mutate({userIds: uId})

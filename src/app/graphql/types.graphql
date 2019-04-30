@@ -13,12 +13,18 @@ mutation addUser($name: String!){
   }
 }
 
-mutation addMessage($content: String!, $userIds: [ID!]!, $conversationIds: ID!) {
-  addMessage(content: $content, userIds: $userIds, conversationId: $conversationIds) {
+mutation addMessage($content: String!, $userId: ID!, $conversationId: ID!) {
+  addMessage(content: $content, userId: $userId, conversationId: $conversationId) {
+    id
     content
     timestamp
     conversation {
       id
+    }
+    user {
+      id
+      name
+      picture_url
     }
   }
 }
@@ -29,6 +35,11 @@ mutation createConversation($userIds: [ID!]!) {
     messages {
       id
       content
+      user {
+        id
+        name
+        picture_url
+      }
     }
     users {
       id
@@ -62,12 +73,19 @@ query conversationsByUsers($userIds: [ID!]!) {
   conversationsByUsers(userIds: $userIds) {
     id
     messages {
+      id
       content
       timestamp
+      user {
+        id
+        picture_url
+        name
+      }
     }
     users {
       id
       name
+      picture_url
     }
   }
 }
@@ -88,6 +106,22 @@ query users {
   users {
     id
     name
+  }
+}
+
+query user($id: ID!) {
+  user(id: $id) {
+    id
+    name
+    picture_url
+    conversations {
+      id
+      messages {
+        id
+        content
+        timestamp
+      }
+    }
   }
 }
 

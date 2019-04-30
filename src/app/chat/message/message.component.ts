@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {Message, MessageAddedGQL, User} from '../../graphql/generated/graphql';
+import {Component, Input, OnInit} from '@angular/core';
+import {Message, MessageAddedGQL, User, UserGQL} from '../../graphql/generated/graphql';
 import {map} from 'rxjs/operators';
 
 @Component({
@@ -9,14 +9,19 @@ import {map} from 'rxjs/operators';
 })
 export class MessageComponent implements OnInit {
 
-  user: User = JSON.parse(sessionStorage.getItem('user'));
-  messagesArray: Message[] = [];
+  user: User;
+  userId: string = sessionStorage.getItem('userId');
+  @Input() messagesArray: Message[] = [];
 
-  constructor(private messageAddedGQL: MessageAddedGQL) {
+  constructor(private messageAddedGQL: MessageAddedGQL, private userGQL: UserGQL) {
+
+    this.userGQL
+      .watch({id: sessionStorage.getItem('userId')}).valueChanges
+      .pipe(map(response => response.data.user))
+      .subscribe(user => this.user = user);
   }
 
   ngOnInit() {
-
     this.messageAddedGQL.subscribe()
       .pipe(map(response => response.data.messageAdded))
       .subscribe((message: Message) => {

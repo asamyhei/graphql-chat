@@ -19,7 +19,6 @@ const typeDefs = gql`
     id: ID!
     name: String
     picture_url: String
-    messages: [Message]
     conversations: [Conversation]
   }
 
@@ -49,7 +48,7 @@ const typeDefs = gql`
 
   type Mutation {
     addUser(name: String!): User
-    addMessage(content: String!, userIds: [ID!]!, conversationId: ID!): Message
+    addMessage(content: String!, userId: ID!, conversationId: ID!): Message
     addUserToConversation(userId: ID!, conversationId: ID!): User
     createConversation(userIds: [ID!]!): Conversation
   }
@@ -62,7 +61,7 @@ const typeDefs = gql`
 
 const resolvers = {
   User: {
-    messages: (user) => Message.find({userId: user.id}),
+    //messages: (user) => Message.find({userId: user.id}),
     conversations: (user) => Conversation.find({userIds: user.id})
   },
   Message: {
@@ -86,13 +85,12 @@ const resolvers = {
 
   Mutation: {
     addMessage: async (parent, args) => {
-
       //Add message
       let message = new Message({
         content: args.content,
+        conversationId: args.conversationId,
         timestamp: Date.now(),
         userId: args.userId,
-        conversationId: args.conversationId
       });
 
       let messageSaved = message.save();
