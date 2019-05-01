@@ -20,6 +20,7 @@ const typeDefs = gql`
     name: String
     picture_url: String
     conversations: [Conversation]
+    password: String
   }
 
   type Message {
@@ -43,11 +44,12 @@ const typeDefs = gql`
     conversations: [Conversation]
     user(id: ID!): User
     users: [User]
+    connectUser(name: String!, password: String!): User
     messages: [Message]
   }
 
   type Mutation {
-    addUser(name: String!): User
+    addUser(name: String!, password: String!): User
     addMessage(content: String!, userId: ID!, conversationId: ID!): Message
     addUserToConversation(userId: ID!, conversationId: ID!): User
     createConversation(userIds: [ID!]!): Conversation
@@ -100,17 +102,29 @@ const resolvers = {
       return messageSaved;
     },
     addUser: async (parent, args) => {
-      let user = new User({
-        name: args.name,
-        picture_url: `https://api.adorable.io/avatars/35/${args.name}.png`,
-        conversationIds: []
-      });
 
-      let userSaved = await user.save();
+      let result = await User.find({name: args.name});
 
-      pubSub.publish(USER_CONNECTED, {userConnected: userSaved});
+      if (result && result.length > 0 && result[0].password === args.password) {
+        console.log("user" + JSON.stringify(result));
+        return result[0];
+      } else if (result && result.length > 0 && result[0].password !== args.password) {
+        console.error("not a match");
+        return null
+      } else {
+        let user = new User({
+          name: args.name,
+          picture_url: `https://api.adorable.io/avatars/35/${args.name}.png`,
+          conversationIds: [],
+          password: args.password
+        });
 
-      return userSaved;
+        let userSaved = await user.save();
+
+        pubSub.publish(USER_CONNECTED, {userConnected: userSaved});
+
+        return userSaved;
+      }
     },
     addUserToConversation: async (parent, args) => {
       Conversation.updateOne({_id: args.conversationId}, {$push: {userIds: args.userId}});

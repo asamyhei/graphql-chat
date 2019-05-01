@@ -9,6 +9,8 @@ import {Router} from '@angular/router';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+  showError = false;
+
   constructor(private addUserGQL: AddUserGQL,
               private route: Router) {
   }
@@ -16,12 +18,16 @@ export class LoginComponent implements OnInit {
   ngOnInit() {
   }
 
-  connect(inputElement: HTMLInputElement) {
-    this.addUserGQL.mutate({name: inputElement.value})
+  connect(inputElement: HTMLInputElement, inputPassword: HTMLInputElement) {
+    this.addUserGQL.mutate({name: inputElement.value, password: inputPassword.value})
       .pipe(map(response => response.data.addUser))
       .subscribe((data: User) => {
-        sessionStorage.setItem('userId', data.id);
-        this.route.navigate(['/chat']);
+        if (data != null) {
+          sessionStorage.setItem('userId', data.id);
+          this.route.navigate(['/chat']);
+        } else {
+          this.showError = true;
+        }
       });
   }
 }

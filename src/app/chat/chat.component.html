@@ -1,6 +1,6 @@
 <div class="d-flex flex-column" style="height: 99%;" *ngIf="user">
   <div class="container-fluid d-flex justify-content-center">
-    {{user!.name!}}
+    {{user.name!}}
   </div>
   <div class="h-100 d-flex flex-row container-fluid row w-100">
     <div
@@ -12,9 +12,9 @@
                [inputFormatter]="formatter"
                (selectItem)="userSelected($event)"/>
       </div>
-      <div *ngIf="user">
-        <app-conversation *ngFor="let conversation of user!.conversations"
-                          [conversation]=conversation></app-conversation>
+      <div>
+        <app-conversation *ngFor="let conversation of user.conversations"
+                          [conversation]=conversation [user]="user" (click)="changeConversation(conversation)"></app-conversation>
       </div>
     </div>
 
@@ -24,9 +24,9 @@
           Pas de conversation selectionné
         </div>
       </div>
-      <div *ngIf="currentConversation && currentConversation.messages" class="h-100">
+      <div *ngIf="currentConversation" class="h-100">
         <div #scrollContainer class="col overflow-auto no-scrollbar" style="height: 83% !important;">
-          <app-message [messagesArray]="currentConversation.messages"></app-message>
+          <app-message [messagesArray]="currentConversation.messages" [user]="user"></app-message>
         </div>
         <div class="py-4 bg-white">
           <div class="row mx-5">

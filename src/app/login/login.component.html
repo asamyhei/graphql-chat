@@ -1,14 +1,14 @@
 <div class="container h-100 d-flex flex-column justify-content-center align-items-center">
   <div class="row my-1">
-    Entrez un nom d'utilisateur
-  </div>
-  <div class="row my-1">
-    <div class="col d-flex">
-      <label>
-        <input #inputElement (keyup.enter)="connect(inputElement)" class="form-control" placeholder="Entrez un nom d'utilisateur"
-               type="text">
-      </label>
-      <button (click)="connect(inputElement)" class=" btn"><i class="material-icons">send</i></button>
+    <div class="col d-flex flex-column">
+      <input #inputElement class="form-control my-2" placeholder="Nom d'utilisateur"
+             type="text">
+      <input #inputPassword (keyup.enter)="connect(inputElement, inputPassword)" class="form-control my-2"
+             placeholder="Mot de passe" type="password">
     </div>
+    <button (click)="connect(inputElement, inputPassword)" class=" btn"><i class="material-icons">send</i></button>
+  </div>
+  <div class="row my-1 text-danger" *ngIf="showError">
+    Erreur dans le login et/ou le mot de passe
   </div>
 </div>

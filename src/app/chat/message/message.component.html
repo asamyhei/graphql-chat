@@ -1,12 +1,12 @@
 <div *ngIf="user && messagesArray.length > 0">
   <div *ngFor="let message of messagesArray" class="row mx-2">
-    <div [class.flex-row-reverse]="message!.user!.id === user!.id"
-         [class.flex-row]="message!.user!.id != user!.id"
+    <div [class.flex-row-reverse]="message.user.id === user.id"
+         [class.flex-row]="message.user.id != user.id"
          class="col d-flex align-items-center bg-light my-2 py-2 rounded-pill">
-      <img [src]="message!.user.picture_url" alt="profile_picture" style="border-radius: 50%">
+      <img [src]="message.user.picture_url" alt="profile_picture" style="border-radius: 50%">
       <div>
-        <div class="mx-3 text-right">{{message!.user.name}}:</div>
-        <div class="mx-3 font-weight-light">{{message!.content}}</div>
+        <div class="mx-3 text-right">{{message.user.name}}:</div>
+        <div class="mx-3 font-weight-light">{{message.content}}</div>
       </div>
     </div>
   </div>

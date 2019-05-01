@@ -1,5 +1,5 @@
-mutation addUser($name: String!){
-  addUser(name: $name) {
+mutation addUser($name: String!, $password: String!){
+  addUser(name: $name, password: $password) {
     id
     name
     picture_url
@@ -120,7 +120,33 @@ query user($id: ID!) {
         id
         content
         timestamp
+        user {
+          id
+          picture_url
+          name
+        }
       }
+    }
+  }
+}
+
+query conversation($id: ID!) {
+  conversation(id: $id) {
+    id
+    messages {
+      content
+      id
+      timestamp
+      user {
+        id
+        name
+        picture_url
+      }
+    }
+    users {
+      id
+      name
+      picture_url
     }
   }
 }

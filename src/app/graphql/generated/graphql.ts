@@ -32,6 +32,7 @@ export type Mutation = {
 
 export type MutationAddUserArgs = {
   name: Scalars["String"];
+  password: Scalars["String"];
 };
 
 export type MutationAddMessageArgs = {
@@ -56,6 +57,7 @@ export type Query = {
   conversations?: Maybe<Array<Maybe<Conversation>>>;
   user?: Maybe<User>;
   users?: Maybe<Array<Maybe<User>>>;
+  connectUser?: Maybe<User>;
   messages?: Maybe<Array<Maybe<Message>>>;
 };
 
@@ -75,6 +77,11 @@ export type QueryUserArgs = {
   id: Scalars["ID"];
 };
 
+export type QueryConnectUserArgs = {
+  name: Scalars["String"];
+  password: Scalars["String"];
+};
+
 export type Subscription = {
   messageAdded?: Maybe<Message>;
   userConnected?: Maybe<User>;
@@ -85,9 +92,11 @@ export type User = {
   name?: Maybe<Scalars["String"]>;
   picture_url?: Maybe<Scalars["String"]>;
   conversations?: Maybe<Array<Maybe<Conversation>>>;
+  password?: Maybe<Scalars["String"]>;
 };
 export type AddUserMutationVariables = {
   name: Scalars["String"];
+  password: Scalars["String"];
 };
 
 export type AddUserMutation = { __typename?: "Mutation" } & {
@@ -285,11 +294,56 @@ export type UserQuery = { __typename?: "Query" } & {
                         { __typename?: "Message" } & Pick<
                           Message,
                           "id" | "content" | "timestamp"
-                        >
+                        > & {
+                            user: Maybe<
+                              { __typename?: "User" } & Pick<
+                                User,
+                                "id" | "picture_url" | "name"
+                              >
+                            >;
+                          }
                       >
                     >
                   >;
                 }
+            >
+          >
+        >;
+      }
+  >;
+};
+
+export type ConversationQueryVariables = {
+  id: Scalars["ID"];
+};
+
+export type ConversationQuery = { __typename?: "Query" } & {
+  conversation: Maybe<
+    { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
+        messages: Maybe<
+          Array<
+            Maybe<
+              { __typename?: "Message" } & Pick<
+                Message,
+                "content" | "id" | "timestamp"
+              > & {
+                  user: Maybe<
+                    { __typename?: "User" } & Pick<
+                      User,
+                      "id" | "name" | "picture_url"
+                    >
+                  >;
+                }
+            >
+          >
+        >;
+        users: Maybe<
+          Array<
+            Maybe<
+              { __typename?: "User" } & Pick<
+                User,
+                "id" | "name" | "picture_url"
+              >
             >
           >
         >;
@@ -332,8 +386,8 @@ import { Injectable } from "@angular/core";
 import * as Apollo from "apollo-angular";
 
 export const AddUserDocument = gql`
-  mutation addUser($name: String!) {
-    addUser(name: $name) {
+  mutation addUser($name: String!, $password: String!) {
+    addUser(name: $name, password: $password) {
       id
       name
       picture_url
@@ -543,6 +597,11 @@ export const UserDocument = gql`
           id
           content
           timestamp
+          user {
+            id
+            picture_url
+            name
+          }
         }
       }
     }
@@ -554,6 +613,38 @@ export const UserDocument = gql`
 })
 export class UserGQL extends Apollo.Query<UserQuery, UserQueryVariables> {
   document = UserDocument;
+}
+export const ConversationDocument = gql`
+  query conversation($id: ID!) {
+    conversation(id: $id) {
+      id
+      messages {
+        content
+        id
+        timestamp
+        user {
+          id
+          name
+          picture_url
+        }
+      }
+      users {
+        id
+        name
+        picture_url
+      }
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: "root"
+})
+export class ConversationGQL extends Apollo.Query<
+  ConversationQuery,
+  ConversationQueryVariables
+> {
+  document = ConversationDocument;
 }
 export const MessageAddedDocument = gql`
   subscription messageAdded {

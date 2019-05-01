@@ -9,16 +9,12 @@ import {map} from 'rxjs/operators';
 })
 export class MessageComponent implements OnInit {
 
-  user: User;
   userId: string = sessionStorage.getItem('userId');
+  @Input() user: User;
   @Input() messagesArray: Message[] = [];
 
-  constructor(private messageAddedGQL: MessageAddedGQL, private userGQL: UserGQL) {
+  constructor(private messageAddedGQL: MessageAddedGQL) {
 
-    this.userGQL
-      .watch({id: sessionStorage.getItem('userId')}).valueChanges
-      .pipe(map(response => response.data.user))
-      .subscribe(user => this.user = user);
   }
 
   ngOnInit() {

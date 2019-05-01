@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Conversation, User, UserGQL} from '../../graphql/generated/graphql';
-import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-conversation',
@@ -9,7 +8,7 @@ import {map} from 'rxjs/operators';
 })
 export class ConversationComponent implements OnInit {
 
-  user: User;
+  @Input() user: User;
   userId: string = sessionStorage.getItem('userId');
   @Input() conversation: Conversation;
 
@@ -17,11 +16,5 @@ export class ConversationComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.userGQL
-      .watch({id: sessionStorage.getItem('userId')}).valueChanges
-      .pipe(map(response => response.data.user))
-      .subscribe(user => {
-        this.user = user
-      });
   }
 }

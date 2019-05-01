@@ -1,14 +1,7 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {debounceTime, distinctUntilChanged, map} from 'rxjs/operators';
 import {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import {
-  AddMessageGQL,
-  Conversation,
-  CreateConversationGQL,
-  User,
-  UserGQL,
-  UsersGQL
-} from '../graphql/generated/graphql';
+import {AddMessageGQL, Conversation, ConversationGQL, CreateConversationGQL, User, UserGQL, UsersGQL} from '../graphql/generated/graphql';
 import {Observable} from 'rxjs';
 
 @Component({
@@ -21,32 +14,37 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   user: User;
   userId: string = sessionStorage.getItem('userId');
   users: User[] = [];
-  currentConversation: Conversation;
+  currentConversation: Conversation = null;
 
   @ViewChild('scrollContainer') private myScrollContainer: ElementRef;
 
   constructor(private addMessageGQL: AddMessageGQL,
               private usersGQL: UsersGQL,
               private userGQL: UserGQL,
-              private createConversationGQL: CreateConversationGQL) {
+              private createConversationGQL: CreateConversationGQL,
+              private conversationGQL: ConversationGQL) {
   }
 
   formatter = (result: User) => result.name;
 
-  search = (text$: Observable<string>) =>
-    text$.pipe(
-      debounceTime(200),
-      distinctUntilChanged(),
-      map(term => term.length < 2 ? []
-        : this.users.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-    );
+  search = (text$: Observable<string>) => text$.pipe(
+    debounceTime(200),
+    distinctUntilChanged(),
+    map(term => term.length < 2 ? []
+      : this.users.filter(v => v.name.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
+  );
 
   ngOnInit() {
 
     this.userGQL
       .watch({id: sessionStorage.getItem('userId')}).valueChanges
       .pipe(map(response => response.data.user))
-      .subscribe(user => this.user = user);
+      .subscribe(user => {
+        this.user = user;
+        if (this.user.conversations) {
+          this.currentConversation = this.user.conversations[0];
+        }
+      });
 
     this.usersGQL
       .watch().valueChanges
@@ -82,14 +80,22 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     inputElement.value = '';
   }
 
-  userSelected($event: NgbTypeaheadSelectItemEvent) {
-    let uId = [$event.item.id, this.userId];
+  userSelected($event: NgbTypeaheadSelectItemEvent,) {
+    const uId = [$event.item.id, this.userId];
 
     this.createConversationGQL
       .mutate({userIds: uId})
       .subscribe((response) => {
         this.currentConversation = response.data.createConversation;
-        console.log(this.currentConversation)
+        console.log(this.currentConversation);
       });
+  }
+
+  changeConversation(conversation: Conversation) {
+    /*this.conversationGQL.watch({id: conversation.id})
+      .valueChanges
+      .pipe(map(response => response.data.conversation))
+      .subscribe(conversation1 => this.currentConversation = conversation1);*/
+    this.currentConversation = conversation;
   }
 }
