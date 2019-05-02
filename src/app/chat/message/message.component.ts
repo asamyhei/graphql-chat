@@ -18,11 +18,6 @@ export class MessageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.messageAddedGQL.subscribe()
-      .pipe(map(response => response.data.messageAdded))
-      .subscribe((message: Message) => {
-        this.messagesArray.push(message);
-      });
   }
 
 }

@@ -5,11 +5,11 @@ const Conversation = require("../models/conversation");
 const gql = require("graphql-tag");
 const {makeExecutableSchema} = require("graphql-tools");
 const {PubSub} = require("graphql-subscriptions");
-const ObjectID = require('mongodb').ObjectID;
 
 const pubSub = new PubSub();
 const MESSAGE_ADDED = "newMessage";
 const USER_CONNECTED = "newUser";
+const NEW_CONVERSATION = "newConversation";
 
 const typeDefs = gql`
 
@@ -35,6 +35,7 @@ const typeDefs = gql`
     id: ID!
     users: [User]
     messages: [Message]
+    timestamp: Float
   }
 
   type Query {
@@ -58,6 +59,7 @@ const typeDefs = gql`
   type Subscription {
     messageAdded: Message
     userConnected: User
+    newConversation: Conversation
   }
 `;
 
@@ -94,6 +96,8 @@ const resolvers = {
         timestamp: Date.now(),
         userId: args.userId,
       });
+
+      await Conversation.updateOne({_id: args.conversationId}, {timestamp: Date.now()});
 
       let messageSaved = message.save();
 
@@ -133,28 +137,28 @@ const resolvers = {
     },
     createConversation: async (parent, args) => {
 
-
       let convSaved = null;
 
-      let result = await Conversation.find({userIds: {$all: args.userIds}});/*, (err, res) => {
-        convSaved = res[0];
-      });*/
+      let result = await Conversation.find({userIds: {$all: args.userIds}});
 
       console.log(result);
-
 
       if (result && result.length > 0) {
         console.log("conv" + JSON.stringify(result));
         return result[0];
       } else {
         let conversation = new Conversation({
-          userIds: args.userIds
+          userIds: args.userIds,
+          timestamp: Date.now()
         });
         convSaved = await conversation.save();
 
         for (let userId of args.userIds) {
           await User.updateOne({_id: userId}, {$push: {conversationIds: convSaved.id}});
         }
+
+        pubSub.publish(NEW_CONVERSATION, {newConversation: convSaved});
+
         return convSaved;
       }
     }
@@ -167,6 +171,9 @@ const resolvers = {
     userConnected: {
       subscribe: () => pubSub.asyncIterator(USER_CONNECTED),
     },
+    newConversation:  {
+      subscribe: () => pubSub.asyncIterator(NEW_CONVERSATION)
+    }
 
   },
 

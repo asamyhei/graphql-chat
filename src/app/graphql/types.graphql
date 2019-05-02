@@ -5,6 +5,7 @@ mutation addUser($name: String!, $password: String!){
     picture_url
     conversations {
       id
+      timestamp
       users {
         id
         name
@@ -19,6 +20,7 @@ mutation addMessage($content: String!, $userId: ID!, $conversationId: ID!) {
     content
     timestamp
     conversation {
+      timestamp
       id
     }
     user {
@@ -32,9 +34,11 @@ mutation addMessage($content: String!, $userId: ID!, $conversationId: ID!) {
 mutation createConversation($userIds: [ID!]!) {
   createConversation(userIds: $userIds) {
     id
+    timestamp
     messages {
-      id
       content
+      id
+      timestamp
       user {
         id
         name
@@ -44,6 +48,7 @@ mutation createConversation($userIds: [ID!]!) {
     users {
       id
       name
+      picture_url
     }
   }
 }
@@ -58,6 +63,7 @@ mutation addUserToConversation($userId: ID!, $conversationID: ID!) {
 query conversationsByUser($userId: ID!) {
   conversationsByUser(userId: $userId) {
     id
+    timestamp
     messages {
       content
       timestamp
@@ -72,6 +78,7 @@ query conversationsByUser($userId: ID!) {
 query conversationsByUsers($userIds: [ID!]!) {
   conversationsByUsers(userIds: $userIds) {
     id
+    timestamp
     messages {
       id
       content
@@ -116,6 +123,7 @@ query user($id: ID!) {
     picture_url
     conversations {
       id
+      timestamp
       messages {
         id
         content
@@ -126,6 +134,11 @@ query user($id: ID!) {
           name
         }
       }
+      users {
+        id
+        name
+        picture_url
+      }
     }
   }
 }
@@ -133,6 +146,7 @@ query user($id: ID!) {
 query conversation($id: ID!) {
   conversation(id: $id) {
     id
+    timestamp
     messages {
       content
       id
@@ -163,6 +177,7 @@ subscription messageAdded{
     }
     conversation {
       id
+      timestamp
       users {
         id
       }
@@ -176,5 +191,26 @@ subscription userJoined {
     id
     name
     picture_url
+  }
+}
+
+subscription newConversation {
+  newConversation {
+    id
+    messages {
+      content
+      id
+      timestamp
+      user {
+        id
+        name
+        picture_url
+      }
+    }
+    users {
+      id
+      name
+      picture_url
+    }
   }
 }

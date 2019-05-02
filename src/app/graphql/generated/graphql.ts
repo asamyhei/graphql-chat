@@ -13,6 +13,7 @@ export type Conversation = {
   id: Scalars["ID"];
   users?: Maybe<Array<Maybe<User>>>;
   messages?: Maybe<Array<Maybe<Message>>>;
+  timestamp?: Maybe<Scalars["Float"]>;
 };
 
 export type Message = {
@@ -85,6 +86,7 @@ export type QueryConnectUserArgs = {
 export type Subscription = {
   messageAdded?: Maybe<Message>;
   userConnected?: Maybe<User>;
+  newConversation?: Maybe<Conversation>;
 };
 
 export type User = {
@@ -100,23 +102,12 @@ export type AddUserMutationVariables = {
 };
 
 export type AddUserMutation = { __typename?: "Mutation" } & {
-  addUser: Maybe<
-    { __typename?: "User" } & Pick<User, "id" | "name" | "picture_url"> & {
-        conversations: Maybe<
-          Array<
-            Maybe<
-              { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-                  users: Maybe<
-                    Array<
-                      Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-      }
-  >;
+  addUser: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "picture_url"> & {
+    conversations: Maybe<Array<Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+      "id" | "timestamp"> & {
+      users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>>;
+    }>>>;
+  }>;
 };
 
 export type AddMessageMutationVariables = {
@@ -126,19 +117,12 @@ export type AddMessageMutationVariables = {
 };
 
 export type AddMessageMutation = { __typename?: "Mutation" } & {
-  addMessage: Maybe<
-    { __typename?: "Message" } & Pick<
-      Message,
-      "id" | "content" | "timestamp"
-    > & {
-        conversation: Maybe<
-          { __typename?: "Conversation" } & Pick<Conversation, "id">
-        >;
-        user: Maybe<
-          { __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">
-        >;
-      }
-  >;
+  addMessage: Maybe<{ __typename?: "Message" } & Pick<Message,
+    "id" | "content" | "timestamp"> & {
+    conversation: Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+      "timestamp" | "id">>;
+    user: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">>;
+  }>;
 };
 
 export type CreateConversationMutationVariables = {
@@ -146,27 +130,15 @@ export type CreateConversationMutationVariables = {
 };
 
 export type CreateConversationMutation = { __typename?: "Mutation" } & {
-  createConversation: Maybe<
-    { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-        messages: Maybe<
-          Array<
-            Maybe<
-              { __typename?: "Message" } & Pick<Message, "id" | "content"> & {
-                  user: Maybe<
-                    { __typename?: "User" } & Pick<
-                      User,
-                      "id" | "name" | "picture_url"
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-        users: Maybe<
-          Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>
-        >;
-      }
-  >;
+  createConversation: Maybe<{ __typename?: "Conversation" } & Pick<Conversation, "id" | "timestamp"> & {
+    messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+      "content" | "id" | "timestamp"> & {
+      user: Maybe<{ __typename?: "User" } & Pick<User,
+        "id" | "name" | "picture_url">>;
+    }>>>;
+    users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User,
+      "id" | "name" | "picture_url">>>>;
+  }>;
 };
 
 export type AddUserToConversationMutationVariables = {
@@ -175,9 +147,7 @@ export type AddUserToConversationMutationVariables = {
 };
 
 export type AddUserToConversationMutation = { __typename?: "Mutation" } & {
-  addUserToConversation: Maybe<
-    { __typename?: "User" } & Pick<User, "id" | "name">
-  >;
+  addUserToConversation: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>;
 };
 
 export type ConversationsByUserQueryVariables = {
@@ -185,27 +155,12 @@ export type ConversationsByUserQueryVariables = {
 };
 
 export type ConversationsByUserQuery = { __typename?: "Query" } & {
-  conversationsByUser: Maybe<
-    Array<
-      Maybe<
-        { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-            messages: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: "Message" } & Pick<
-                    Message,
-                    "content" | "timestamp"
-                  >
-                >
-              >
-            >;
-            users: Maybe<
-              Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>
-            >;
-          }
-      >
-    >
-  >;
+  conversationsByUser: Maybe<Array<Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+    "id" | "timestamp"> & {
+    messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+      "content" | "timestamp">>>>;
+    users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>>;
+  }>>>;
 };
 
 export type ConversationsByUsersQueryVariables = {
@@ -213,68 +168,31 @@ export type ConversationsByUsersQueryVariables = {
 };
 
 export type ConversationsByUsersQuery = { __typename?: "Query" } & {
-  conversationsByUsers: Maybe<
-    Array<
-      Maybe<
-        { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-            messages: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: "Message" } & Pick<
-                    Message,
-                    "id" | "content" | "timestamp"
-                  > & {
-                      user: Maybe<
-                        { __typename?: "User" } & Pick<
-                          User,
-                          "id" | "picture_url" | "name"
-                        >
-                      >;
-                    }
-                >
-              >
-            >;
-            users: Maybe<
-              Array<
-                Maybe<
-                  { __typename?: "User" } & Pick<
-                    User,
-                    "id" | "name" | "picture_url"
-                  >
-                >
-              >
-            >;
-          }
-      >
-    >
-  >;
+  conversationsByUsers: Maybe<Array<Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+    "id" | "timestamp"> & {
+    messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+      "id" | "content" | "timestamp"> & {
+      user: Maybe<{ __typename?: "User" } & Pick<User,
+        "id" | "picture_url" | "name">>;
+    }>>>;
+    users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User,
+      "id" | "name" | "picture_url">>>>;
+  }>>>;
 };
 
 export type MessagesQueryVariables = {};
 
 export type MessagesQuery = { __typename?: "Query" } & {
-  messages: Maybe<
-    Array<
-      Maybe<
-        { __typename?: "Message" } & Pick<Message, "content" | "timestamp"> & {
-            user: Maybe<
-              { __typename?: "User" } & Pick<
-                User,
-                "id" | "name" | "picture_url"
-              >
-            >;
-          }
-      >
-    >
-  >;
+  messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message, "content" | "timestamp"> & {
+    user: Maybe<{ __typename?: "User" } & Pick<User,
+      "id" | "name" | "picture_url">>;
+  }>>>;
 };
 
 export type UsersQueryVariables = {};
 
 export type UsersQuery = { __typename?: "Query" } & {
-  users: Maybe<
-    Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>
-  >;
+  users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User, "id" | "name">>>>;
 };
 
 export type UserQueryVariables = {
@@ -282,35 +200,18 @@ export type UserQueryVariables = {
 };
 
 export type UserQuery = { __typename?: "Query" } & {
-  user: Maybe<
-    { __typename?: "User" } & Pick<User, "id" | "name" | "picture_url"> & {
-        conversations: Maybe<
-          Array<
-            Maybe<
-              { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-                  messages: Maybe<
-                    Array<
-                      Maybe<
-                        { __typename?: "Message" } & Pick<
-                          Message,
-                          "id" | "content" | "timestamp"
-                        > & {
-                            user: Maybe<
-                              { __typename?: "User" } & Pick<
-                                User,
-                                "id" | "picture_url" | "name"
-                              >
-                            >;
-                          }
-                      >
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-      }
-  >;
+  user: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "picture_url"> & {
+    conversations: Maybe<Array<Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+      "id" | "timestamp"> & {
+      messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+        "id" | "content" | "timestamp"> & {
+        user: Maybe<{ __typename?: "User" } & Pick<User,
+          "id" | "picture_url" | "name">>;
+      }>>>;
+      users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User,
+        "id" | "name" | "picture_url">>>>;
+    }>>>;
+  }>;
 };
 
 export type ConversationQueryVariables = {
@@ -318,71 +219,52 @@ export type ConversationQueryVariables = {
 };
 
 export type ConversationQuery = { __typename?: "Query" } & {
-  conversation: Maybe<
-    { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-        messages: Maybe<
-          Array<
-            Maybe<
-              { __typename?: "Message" } & Pick<
-                Message,
-                "content" | "id" | "timestamp"
-              > & {
-                  user: Maybe<
-                    { __typename?: "User" } & Pick<
-                      User,
-                      "id" | "name" | "picture_url"
-                    >
-                  >;
-                }
-            >
-          >
-        >;
-        users: Maybe<
-          Array<
-            Maybe<
-              { __typename?: "User" } & Pick<
-                User,
-                "id" | "name" | "picture_url"
-              >
-            >
-          >
-        >;
-      }
-  >;
+  conversation: Maybe<{ __typename?: "Conversation" } & Pick<Conversation, "id" | "timestamp"> & {
+    messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+      "content" | "id" | "timestamp"> & {
+      user: Maybe<{ __typename?: "User" } & Pick<User,
+        "id" | "name" | "picture_url">>;
+    }>>>;
+    users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User,
+      "id" | "name" | "picture_url">>>>;
+  }>;
 };
 
 export type MessageAddedSubscriptionVariables = {};
 
 export type MessageAddedSubscription = { __typename?: "Subscription" } & {
-  messageAdded: Maybe<
-    { __typename?: "Message" } & Pick<
-      Message,
-      "id" | "content" | "timestamp"
-    > & {
-        user: Maybe<
-          { __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">
-        >;
-        conversation: Maybe<
-          { __typename?: "Conversation" } & Pick<Conversation, "id"> & {
-              users: Maybe<
-                Array<Maybe<{ __typename?: "User" } & Pick<User, "id">>>
-              >;
-            }
-        >;
-      }
-  >;
+  messageAdded: Maybe<{ __typename?: "Message" } & Pick<Message,
+    "id" | "content" | "timestamp"> & {
+    user: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">>;
+    conversation: Maybe<{ __typename?: "Conversation" } & Pick<Conversation,
+      "id" | "timestamp"> & {
+      users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User, "id">>>>;
+    }>;
+  }>;
 };
 
 export type UserJoinedSubscriptionVariables = {};
 
 export type UserJoinedSubscription = { __typename?: "Subscription" } & {
-  userConnected: Maybe<
-    { __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">
-  >;
+  userConnected: Maybe<{ __typename?: "User" } & Pick<User, "id" | "name" | "picture_url">>;
+};
+
+export type NewConversationSubscriptionVariables = {};
+
+export type NewConversationSubscription = { __typename?: "Subscription" } & {
+  newConversation: Maybe<{ __typename?: "Conversation" } & Pick<Conversation, "id"> & {
+    messages: Maybe<Array<Maybe<{ __typename?: "Message" } & Pick<Message,
+      "content" | "id" | "timestamp"> & {
+      user: Maybe<{ __typename?: "User" } & Pick<User,
+        "id" | "name" | "picture_url">>;
+    }>>>;
+    users: Maybe<Array<Maybe<{ __typename?: "User" } & Pick<User,
+      "id" | "name" | "picture_url">>>>;
+  }>;
 };
 
 import gql from "graphql-tag";
-import { Injectable } from "@angular/core";
+import {Injectable} from "@angular/core";
 import * as Apollo from "apollo-angular";
 
 export const AddUserDocument = gql`
@@ -393,6 +275,7 @@ export const AddUserDocument = gql`
       picture_url
       conversations {
         id
+        timestamp
         users {
           id
           name
@@ -405,12 +288,11 @@ export const AddUserDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class AddUserGQL extends Apollo.Mutation<
-  AddUserMutation,
-  AddUserMutationVariables
-> {
+export class AddUserGQL extends Apollo.Mutation<AddUserMutation,
+  AddUserMutationVariables> {
   document = AddUserDocument;
 }
+
 export const AddMessageDocument = gql`
   mutation addMessage($content: String!, $userId: ID!, $conversationId: ID!) {
     addMessage(
@@ -422,6 +304,7 @@ export const AddMessageDocument = gql`
       content
       timestamp
       conversation {
+        timestamp
         id
       }
       user {
@@ -436,19 +319,20 @@ export const AddMessageDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class AddMessageGQL extends Apollo.Mutation<
-  AddMessageMutation,
-  AddMessageMutationVariables
-> {
+export class AddMessageGQL extends Apollo.Mutation<AddMessageMutation,
+  AddMessageMutationVariables> {
   document = AddMessageDocument;
 }
+
 export const CreateConversationDocument = gql`
   mutation createConversation($userIds: [ID!]!) {
     createConversation(userIds: $userIds) {
       id
+      timestamp
       messages {
-        id
         content
+        id
+        timestamp
         user {
           id
           name
@@ -458,6 +342,7 @@ export const CreateConversationDocument = gql`
       users {
         id
         name
+        picture_url
       }
     }
   }
@@ -466,12 +351,11 @@ export const CreateConversationDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class CreateConversationGQL extends Apollo.Mutation<
-  CreateConversationMutation,
-  CreateConversationMutationVariables
-> {
+export class CreateConversationGQL extends Apollo.Mutation<CreateConversationMutation,
+  CreateConversationMutationVariables> {
   document = CreateConversationDocument;
 }
+
 export const AddUserToConversationDocument = gql`
   mutation addUserToConversation($userId: ID!, $conversationID: ID!) {
     addUserToConversation(userId: $userId, conversationId: $conversationID) {
@@ -484,16 +368,16 @@ export const AddUserToConversationDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class AddUserToConversationGQL extends Apollo.Mutation<
-  AddUserToConversationMutation,
-  AddUserToConversationMutationVariables
-> {
+export class AddUserToConversationGQL extends Apollo.Mutation<AddUserToConversationMutation,
+  AddUserToConversationMutationVariables> {
   document = AddUserToConversationDocument;
 }
+
 export const ConversationsByUserDocument = gql`
   query conversationsByUser($userId: ID!) {
     conversationsByUser(userId: $userId) {
       id
+      timestamp
       messages {
         content
         timestamp
@@ -509,16 +393,16 @@ export const ConversationsByUserDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class ConversationsByUserGQL extends Apollo.Query<
-  ConversationsByUserQuery,
-  ConversationsByUserQueryVariables
-> {
+export class ConversationsByUserGQL extends Apollo.Query<ConversationsByUserQuery,
+  ConversationsByUserQueryVariables> {
   document = ConversationsByUserDocument;
 }
+
 export const ConversationsByUsersDocument = gql`
   query conversationsByUsers($userIds: [ID!]!) {
     conversationsByUsers(userIds: $userIds) {
       id
+      timestamp
       messages {
         id
         content
@@ -541,12 +425,11 @@ export const ConversationsByUsersDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class ConversationsByUsersGQL extends Apollo.Query<
-  ConversationsByUsersQuery,
-  ConversationsByUsersQueryVariables
-> {
+export class ConversationsByUsersGQL extends Apollo.Query<ConversationsByUsersQuery,
+  ConversationsByUsersQueryVariables> {
   document = ConversationsByUsersDocument;
 }
+
 export const MessagesDocument = gql`
   query messages {
     messages {
@@ -564,12 +447,11 @@ export const MessagesDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class MessagesGQL extends Apollo.Query<
-  MessagesQuery,
-  MessagesQueryVariables
-> {
+export class MessagesGQL extends Apollo.Query<MessagesQuery,
+  MessagesQueryVariables> {
   document = MessagesDocument;
 }
+
 export const UsersDocument = gql`
   query users {
     users {
@@ -585,6 +467,7 @@ export const UsersDocument = gql`
 export class UsersGQL extends Apollo.Query<UsersQuery, UsersQueryVariables> {
   document = UsersDocument;
 }
+
 export const UserDocument = gql`
   query user($id: ID!) {
     user(id: $id) {
@@ -593,6 +476,7 @@ export const UserDocument = gql`
       picture_url
       conversations {
         id
+        timestamp
         messages {
           id
           content
@@ -602,6 +486,11 @@ export const UserDocument = gql`
             picture_url
             name
           }
+        }
+        users {
+          id
+          name
+          picture_url
         }
       }
     }
@@ -614,9 +503,90 @@ export const UserDocument = gql`
 export class UserGQL extends Apollo.Query<UserQuery, UserQueryVariables> {
   document = UserDocument;
 }
+
 export const ConversationDocument = gql`
   query conversation($id: ID!) {
     conversation(id: $id) {
+      id
+      timestamp
+      messages {
+        content
+        id
+        timestamp
+        user {
+          id
+          name
+          picture_url
+        }
+      }
+      users {
+        id
+        name
+        picture_url
+      }
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: "root"
+})
+export class ConversationGQL extends Apollo.Query<ConversationQuery,
+  ConversationQueryVariables> {
+  document = ConversationDocument;
+}
+
+export const MessageAddedDocument = gql`
+  subscription messageAdded {
+    messageAdded {
+      id
+      content
+      timestamp
+      user {
+        id
+        name
+        picture_url
+      }
+      conversation {
+        id
+        timestamp
+        users {
+          id
+        }
+      }
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: "root"
+})
+export class MessageAddedGQL extends Apollo.Subscription<MessageAddedSubscription,
+  MessageAddedSubscriptionVariables> {
+  document = MessageAddedDocument;
+}
+
+export const UserJoinedDocument = gql`
+  subscription userJoined {
+    userConnected {
+      id
+      name
+      picture_url
+    }
+  }
+`;
+
+@Injectable({
+  providedIn: "root"
+})
+export class UserJoinedGQL extends Apollo.Subscription<UserJoinedSubscription,
+  UserJoinedSubscriptionVariables> {
+  document = UserJoinedDocument;
+}
+
+export const NewConversationDocument = gql`
+  subscription newConversation {
+    newConversation {
       id
       messages {
         content
@@ -640,58 +610,7 @@ export const ConversationDocument = gql`
 @Injectable({
   providedIn: "root"
 })
-export class ConversationGQL extends Apollo.Query<
-  ConversationQuery,
-  ConversationQueryVariables
-> {
-  document = ConversationDocument;
-}
-export const MessageAddedDocument = gql`
-  subscription messageAdded {
-    messageAdded {
-      id
-      content
-      timestamp
-      user {
-        id
-        name
-        picture_url
-      }
-      conversation {
-        id
-        users {
-          id
-        }
-      }
-    }
-  }
-`;
-
-@Injectable({
-  providedIn: "root"
-})
-export class MessageAddedGQL extends Apollo.Subscription<
-  MessageAddedSubscription,
-  MessageAddedSubscriptionVariables
-> {
-  document = MessageAddedDocument;
-}
-export const UserJoinedDocument = gql`
-  subscription userJoined {
-    userConnected {
-      id
-      name
-      picture_url
-    }
-  }
-`;
-
-@Injectable({
-  providedIn: "root"
-})
-export class UserJoinedGQL extends Apollo.Subscription<
-  UserJoinedSubscription,
-  UserJoinedSubscriptionVariables
-> {
-  document = UserJoinedDocument;
+export class NewConversationGQL extends Apollo.Subscription<NewConversationSubscription,
+  NewConversationSubscriptionVariables> {
+  document = NewConversationDocument;
 }
