@@ -14,6 +14,8 @@ import {ChatComponent} from './chat/chat.component';
 import {ConversationComponent} from './chat/conversation/conversation.component';
 import {ReactiveFormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {UserGQL} from './graphql/generated/graphql';
+import {UserService} from './service/user.service';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     ReactiveFormsModule,
     NgbModule
   ],
-  providers: [],
+  providers: [UserService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

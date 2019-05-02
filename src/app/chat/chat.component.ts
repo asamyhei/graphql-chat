@@ -14,6 +14,7 @@ import {
   UsersGQL
 } from '../graphql/generated/graphql';
 import {Observable} from 'rxjs';
+import {UserService} from '../service/user.service';
 
 @Component({
   selector: 'app-chat',
@@ -36,7 +37,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
               private createConversationGQL: CreateConversationGQL,
               private messageAddedGQL: MessageAddedGQL,
               private newConversation: NewConversationGQL,
-              private userJoinedGQL: UserJoinedGQL) {
+              private userJoinedGQL: UserJoinedGQL,
+              private userService: UserService) {
   }
 
   formatter = (result: User) => result.name;
@@ -49,7 +51,18 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   );
 
   ngOnInit() {
-    this.userGQL
+
+    this.userService.user.subscribe((user: User) => {
+      this.user = user;
+      console.log(user);
+
+      if (this.user.conversations) {
+        this.currentConversation = this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)[0];
+      }
+
+    });
+
+/*    this.userGQL
       .watch({id: sessionStorage.getItem('userId')}).valueChanges
       .pipe(map(response => response.data.user), first())
       .subscribe(user => {
@@ -57,7 +70,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         if (this.user.conversations) {
           this.currentConversation = this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)[0];
         }
-      });
+      });*/
 
     this.usersGQL
       .watch().valueChanges

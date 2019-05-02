@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {map} from 'rxjs/operators';
 import {AddUserGQL, User} from '../graphql/generated/graphql';
 import {Router} from '@angular/router';
+import {UserService} from '../service/user.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +13,8 @@ export class LoginComponent implements OnInit {
   showError = false;
 
   constructor(private addUserGQL: AddUserGQL,
-              private route: Router) {
+              private route: Router,
+              private userService: UserService) {
   }
 
   ngOnInit() {
@@ -23,6 +25,7 @@ export class LoginComponent implements OnInit {
       .pipe(map(response => response.data.addUser))
       .subscribe((data: User) => {
         if (data != null) {
+          this.userService.userChanged(data);
           sessionStorage.setItem('userId', data.id);
           this.route.navigate(['/chat']);
         } else {
