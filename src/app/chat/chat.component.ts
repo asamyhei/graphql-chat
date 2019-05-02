@@ -54,23 +54,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     this.userService.user.subscribe((user: User) => {
       this.user = user;
-      console.log(user);
-
-      if (this.user.conversations) {
+      if (this.user && this.user.conversations) {
         this.currentConversation = this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)[0];
       }
-
     });
-
-/*    this.userGQL
-      .watch({id: sessionStorage.getItem('userId')}).valueChanges
-      .pipe(map(response => response.data.user), first())
-      .subscribe(user => {
-        this.user = user;
-        if (this.user.conversations) {
-          this.currentConversation = this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)[0];
-        }
-      });*/
 
     this.usersGQL
       .watch().valueChanges
@@ -93,7 +80,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         let convIndex = this.user.conversations.map(conv => conv.id).indexOf(message.conversation.id);
         if (convIndex > -1) {
           this.user.conversations[convIndex].messages.push(message);
-          this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)
+          this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1);
         }
       });
 
@@ -101,7 +88,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       .pipe(map(response => response.data.newConversation), first())
       .subscribe((conversation: Conversation) => {
           if (conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
-            this.user.conversations.push(conversation)
+            this.user.conversations.push(conversation);
           }
         }
       );

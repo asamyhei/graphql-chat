@@ -19,7 +19,7 @@ export class UserService {
       .pipe(map(response => response.data.user), first())
       .subscribe(user => {
         this.userChanged(user);
-      })
+      });
 
   }
 
