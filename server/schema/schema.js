@@ -65,8 +65,7 @@ const typeDefs = gql`
 
 const resolvers = {
   User: {
-    //messages: (user) => Message.find({userId: user.id}),
-    conversations: (user) => Conversation.find({userIds: user.id})
+    conversations: (user) => Conversation.find({userIds: user.id}).sort({timestamp: -1})
   },
   Message: {
     user: (message) => User.findById(message.userId),
@@ -74,15 +73,15 @@ const resolvers = {
   },
   Conversation: {
     users: (conversation) => User.find({conversationIds: conversation.id}),
-    messages: (conversation) => Message.find({conversationId: conversation.id})
+    messages: (conversation) => Message.find({conversationId: conversation.id}).sort({timestamp: 1})
   },
 
   Query: {
-    conversations: (parent, args) => Conversation.find(),
+    conversations: (parent, args) => Conversation.find().sort({timestamp: 1}),
     conversation: (parent, args) => Conversation.findById(args.id),
     conversationsByUser: (parent, args) => Conversation.find({userIds: args.userId}),
     conversationsByUsers: (parent, args) => Conversation.find({userIds: {$all: args.userIds}}),
-    messages: () => Message.find({}),
+    messages: () => Message.find({}).sort({timestamp: 1}),
     user: (parent, args) => User.findById(args.id),
     users: () => User.find({}),
   },
@@ -110,10 +109,8 @@ const resolvers = {
       let result = await User.find({name: args.name});
 
       if (result && result.length > 0 && result[0].password === args.password) {
-        console.log("user" + JSON.stringify(result));
         return result[0];
       } else if (result && result.length > 0 && result[0].password !== args.password) {
-        console.error("not a match");
         return null
       } else {
         let user = new User({
@@ -136,15 +133,9 @@ const resolvers = {
       return User.findById(args.userId);
     },
     createConversation: async (parent, args) => {
-
       let convSaved = null;
-
       let result = await Conversation.find({userIds: {$all: args.userIds}});
-
-      console.log(result);
-
       if (result && result.length > 0) {
-        console.log("conv" + JSON.stringify(result));
         return result[0];
       } else {
         let conversation = new Conversation({
@@ -171,7 +162,7 @@ const resolvers = {
     userConnected: {
       subscribe: () => pubSub.asyncIterator(USER_CONNECTED),
     },
-    newConversation:  {
+    newConversation: {
       subscribe: () => pubSub.asyncIterator(NEW_CONVERSATION)
     }
 

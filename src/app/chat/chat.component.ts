@@ -1,20 +1,11 @@
 import {AfterViewChecked, Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {debounceTime, distinctUntilChanged, first, map} from 'rxjs/operators';
 import {NgbTypeaheadSelectItemEvent} from '@ng-bootstrap/ng-bootstrap';
-import {
-  AddMessageGQL,
-  Conversation,
-  CreateConversationGQL,
-  Message,
-  MessageAddedGQL,
-  NewConversationGQL,
-  User,
-  UserGQL,
-  UserJoinedGQL,
-  UsersGQL
-} from '../graphql/generated/graphql';
+import {AddMessageGQL, Conversation, User} from '../graphql/generated/graphql';
 import {Observable} from 'rxjs';
 import {UserService} from '../service/user.service';
+import {ConversationService} from '../service/conversation.service';
+import {MessageService} from '../service/message.service';
 
 @Component({
   selector: 'app-chat',
@@ -24,21 +15,15 @@ import {UserService} from '../service/user.service';
 export class ChatComponent implements OnInit, AfterViewChecked {
 
   user: User;
-  userId: string = sessionStorage.getItem('userId');
   users: User[] = [];
   currentConversation: Conversation = null;
-  currentConversationIndex: number = 0;
 
   @ViewChild('scrollContainer') private myScrollContainer: ElementRef;
 
   constructor(private addMessageGQL: AddMessageGQL,
-              private usersGQL: UsersGQL,
-              private userGQL: UserGQL,
-              private createConversationGQL: CreateConversationGQL,
-              private messageAddedGQL: MessageAddedGQL,
-              private newConversation: NewConversationGQL,
-              private userJoinedGQL: UserJoinedGQL,
-              private userService: UserService) {
+              private userService: UserService,
+              private conversationService: ConversationService,
+              private messageService: MessageService) {
   }
 
   formatter = (result: User) => result.name;
@@ -51,47 +36,35 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   );
 
   ngOnInit() {
-
     this.userService.user.subscribe((user: User) => {
       this.user = user;
       if (this.user && this.user.conversations) {
-        this.currentConversation = this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1)[0];
+        this.changeConversation(this.user.conversations[0]);
       }
     });
 
-    this.usersGQL
-      .watch().valueChanges
-      .pipe(
-        map(response => response.data.users), first())
-      .subscribe(data => {
-          this.users = data.filter(user => user.id !== this.userId);
+    this.userService.users.subscribe((users: User[]) => {
+      this.users = users;
+    });
+
+    this.conversationService.conversation.subscribe(conversation => {
+      if (conversation) {
+        console.log(conversation);
+        if (this.user.conversations.map(c => c.id).indexOf(conversation.id) <= -1 && conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
+          this.user.conversations.unshift(conversation);
         }
-      );
+        this.currentConversation = conversation;
+      }
+    });
 
-    this.userJoinedGQL
-      .subscribe()
-      .pipe(map(response => response.data.userConnected))
-      .subscribe((user: User) => this.users.push(user));
-
-
-    this.messageAddedGQL.subscribe()
-      .pipe(map(response => response.data.messageAdded))
-      .subscribe((message: Message) => {
+    this.messageService.newMessage.subscribe(message => {
+      if (message) {
         let convIndex = this.user.conversations.map(conv => conv.id).indexOf(message.conversation.id);
         if (convIndex > -1) {
           this.user.conversations[convIndex].messages.push(message);
-          this.user.conversations.sort((c1, c2) => c1.timestamp - c2.timestamp > 0 ? -1 : 1);
         }
-      });
-
-    this.newConversation.subscribe()
-      .pipe(map(response => response.data.newConversation), first())
-      .subscribe((conversation: Conversation) => {
-          if (conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
-            this.user.conversations.push(conversation);
-          }
-        }
-      );
+      }
+    });
 
     this.scrollToBottom();
   }
@@ -108,28 +81,23 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   }
 
   sendMessage(inputElement: HTMLInputElement) {
-    this.addMessageGQL.mutate({
+
+    this.messageService.addMessage({
       content: inputElement.value,
-      userId: this.userId,
-      conversationId: this.currentConversation.id
-    }).pipe(first()).subscribe();
+      user: this.user,
+      conversation: this.currentConversation,
+      id: null
+    });
 
     inputElement.value = '';
   }
 
   userSelected($event: NgbTypeaheadSelectItemEvent,) {
-    const uId = [$event.item.id, this.userId];
-
-    this.createConversationGQL
-      .mutate({userIds: uId})
-      .pipe(first())
-      .subscribe((response) => {
-        this.changeConversation(response.data.createConversation);
-      });
+    const uId = [$event.item.id, this.user.id];
+    this.conversationService.createNewConversation(uId);
   }
 
   changeConversation(conversation: Conversation) {
-    this.currentConversation = conversation;
-    this.currentConversationIndex = this.user.conversations.map(conv => conv.id).indexOf(conversation.id);
+    this.conversationService.changeConversation(conversation);
   }
 }

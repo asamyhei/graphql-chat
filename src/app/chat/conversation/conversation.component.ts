@@ -10,7 +10,6 @@ export class ConversationComponent implements OnInit, OnChanges {
 
   @Input() user: User;
   @Input() conversation: Conversation;
-  userId: string = sessionStorage.getItem('userId');
   otherUser: User;
 
   constructor(private userGQL: UserGQL) {

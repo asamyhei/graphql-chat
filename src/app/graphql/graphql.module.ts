@@ -15,7 +15,7 @@ import {getMainDefinition} from 'apollo-utilities';
 export class GraphqlModule {
   constructor(apollo: Apollo, private httpClient: HttpClient) {
     const httpLink = new HttpLink(httpClient).create({
-      uri: 'http://localhost:8080/graphql'
+      uri: 'http://localhost:8080/graphql',
     });
 
     const subscriptionLink = new WebSocketLink({

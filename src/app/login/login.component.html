@@ -8,7 +8,7 @@
     </div>
     <button (click)="connect(inputElement, inputPassword)" class=" btn"><i class="material-icons">send</i></button>
   </div>
-  <div class="row my-1 text-danger" *ngIf="showError">
+  <div *ngIf="showError" class="row my-1 text-danger">
     Erreur dans le login et/ou le mot de passe
   </div>
 </div>

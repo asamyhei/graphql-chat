@@ -1,29 +1,39 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
-import {Conversation, NewConversationGQL} from '../graphql/generated/graphql';
+import {AddMessageGQL, Message, MessageAddedGQL} from '../graphql/generated/graphql';
 import {first, map} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ConversationService {
+export class MessageService {
 
-  private conversationSubject: BehaviorSubject<Conversation> = new BehaviorSubject(null);
-  conversation = this.conversationSubject.asObservable();
+  /*private messageSubject:  BehaviorSubject<Message> = new BehaviorSubject(null);
+  message = this.messageSubject.asObservable();*/
 
-  private newConversationSubject: BehaviorSubject<Conversation> = new BehaviorSubject(null);
-  newConversation = this.newConversationSubject.asObservable();
+  private newMessageSubject: BehaviorSubject<Message> = new BehaviorSubject(null);
+  newMessage = this.newMessageSubject.asObservable();
 
-  constructor(private newConversationGQL: NewConversationGQL) {
-    this.newConversationGQL.subscribe()
-      .pipe(map(response => response.data.newConversation), first())
-      .subscribe((conversation: Conversation) => {
-          this.changeConversation(conversation);
-        }
-      );
+  constructor(private messageAddedGQL: MessageAddedGQL, private addMessageGQL: AddMessageGQL) {
+
+    this.messageAddedGQL.subscribe()
+      .pipe(map(response => response.data.messageAdded))
+      .subscribe((message: Message) => {
+        this.newMessageAdded(message);
+      });
+
   }
 
-  changeConversation(conversation: Conversation) {
-    this.conversationSubject.next(conversation);
+  newMessageAdded(message: Message) {
+    this.newMessageSubject.next(message);
+  }
+
+  addMessage(message: Message) {
+    this.addMessageGQL.mutate({
+      userId: message.user.id,
+      content: message.content,
+      conversationId: message.conversation.id
+    }).pipe(first()).subscribe();
+
   }
 }

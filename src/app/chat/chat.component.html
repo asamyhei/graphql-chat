@@ -1,4 +1,4 @@
-<div class="d-flex flex-column" style="height: 99%;" *ngIf="user">
+<div *ngIf="user" class="d-flex flex-column" style="height: 99%;">
   <div class="container-fluid d-flex justify-content-center">
     {{user.name!}}
   </div>
@@ -6,27 +6,28 @@
     <div
       class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block">
       <div class="row my-1 mx-2">
-        <input id="typeahead-basic" type="text" class="form-control"
-               [ngbTypeahead]="search"
+        <input (selectItem)="userSelected($event)" [inputFormatter]="formatter" [ngbTypeahead]="search"
                [resultFormatter]="formatter"
-               [inputFormatter]="formatter"
-               (selectItem)="userSelected($event)"/>
+               class="form-control"
+               id="typeahead-basic"
+               type="text"/>
       </div>
       <div>
-        <app-conversation *ngFor="let conversation of user.conversations"
-                          [conversation]=conversation [user]="user" (click)="changeConversation(conversation)"></app-conversation>
+        <app-conversation (click)="changeConversation(conversation)"
+                          *ngFor="let conversation of user.conversations" [conversation]=conversation
+                          [user]="user"></app-conversation>
       </div>
     </div>
 
     <div class="col h-100">
-      <div class="col overflow-auto no-scrollbar h-100" *ngIf="currentConversation === null">
+      <div *ngIf="currentConversation === null" class="col overflow-auto no-scrollbar h-100">
         <div class="row h-100 justify-content-center align-content-center">
           Pas de conversation selectionné
         </div>
       </div>
       <div *ngIf="currentConversation" class="h-100">
         <div #scrollContainer class="col overflow-auto no-scrollbar" style="height: 83% !important;">
-          <app-message [messagesArray]="user.conversations[currentConversationIndex].messages" [user]="user"></app-message>
+          <app-message [messagesArray]="currentConversation.messages" [user]="user"></app-message>
         </div>
         <div class="py-4 bg-white">
           <div class="row mx-5">

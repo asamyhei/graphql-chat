@@ -25,8 +25,8 @@ export class LoginComponent implements OnInit {
       .pipe(map(response => response.data.addUser))
       .subscribe((data: User) => {
         if (data != null) {
-          this.userService.userChanged(data);
           sessionStorage.setItem('userId', data.id);
+          this.userService.userChanged(data);
           this.route.navigate(['/chat']);
         } else {
           this.showError = true;
