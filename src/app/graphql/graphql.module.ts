@@ -10,37 +10,37 @@ import {WebSocketLink} from 'apollo-link-ws';
 import {getMainDefinition} from 'apollo-utilities';
 
 @NgModule({
-  exports: [HttpClientModule, ApolloModule, HttpLinkModule]
+   exports: [HttpClientModule, ApolloModule, HttpLinkModule]
 })
 export class GraphqlModule {
-  constructor(apollo: Apollo, private httpClient: HttpClient) {
-    const httpLink = new HttpLink(httpClient).create({
-      uri: 'http://localhost:8080/graphql',
-    });
+   constructor(apollo: Apollo, private httpClient: HttpClient) {
+      const httpLink = new HttpLink(httpClient).create({
+         uri: 'http://localhost:8080/graphql',
+      });
 
-    const subscriptionLink = new WebSocketLink({
-      uri:
-        'ws://localhost:8080/graphql',
-      options: {
-        reconnect: true,
-        connectionParams: {
-          authToken: localStorage.getItem('token') || null
-        }
-      }
-    });
+      const subscriptionLink = new WebSocketLink({
+         uri:
+            'ws://localhost:8080/graphql',
+         options: {
+            reconnect: true,
+            connectionParams: {
+               authToken: localStorage.getItem('token') || null
+            }
+         }
+      });
 
-    const link = split(
-      ({query}) => {
-        const {kind, operation} = getMainDefinition(query);
-        return kind === 'OperationDefinition' && operation === 'subscription';
-      },
-      subscriptionLink,
-      httpLink
-    );
+      const link = split(
+         ({query}) => {
+            const {kind, operation} = getMainDefinition(query);
+            return kind === 'OperationDefinition' && operation === 'subscription';
+         },
+         subscriptionLink,
+         httpLink
+      );
 
-    apollo.create({
-      link,
-      cache: new InMemoryCache()
-    });
-  }
+      apollo.create({
+         link,
+         cache: new InMemoryCache()
+      });
+   }
 }

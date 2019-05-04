@@ -1,10 +1,10 @@
 <div *ngIf="user && conversation" class="row" style="cursor: pointer">
-  <div class="col d-flex align-items-center py-2 border border-bottom-0 border-right-0 flex-row">
-    <img [src]="otherUser.picture_url" alt="profile_picture" style="border-radius: 50%">
-    <div>
-      <div class="mx-3">{{otherUser.name}}</div>
-      <div *ngIf="conversation.messages.length > 0"
-           class="mx-3 font-weight-light">{{conversation.messages[conversation.messages.length - 1].content}}</div>
-    </div>
-  </div>
+   <div class="col d-flex align-items-center py-2 border border-bottom-0 border-right-0 flex-row">
+      <img [src]="otherUser.picture_url" alt="profile_picture" style="border-radius: 50%">
+      <div>
+         <div class="mx-3">{{otherUser.name}}</div>
+         <div *ngIf="conversation.messages.length > 0"
+              class="mx-3 font-weight-light">{{conversation.messages[conversation.messages.length - 1].content}}</div>
+      </div>
+   </div>
 </div>

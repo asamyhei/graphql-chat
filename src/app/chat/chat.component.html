@@ -1,47 +1,47 @@
 <div *ngIf="user" class="d-flex flex-column" style="height: 99%;">
-  <div class="container-fluid d-flex justify-content-center">
-    {{user.name!}}
-  </div>
-  <div class="h-100 d-flex flex-row container-fluid row w-100">
-    <div
-      class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block">
-      <div class="row my-1 mx-2">
-        <input (selectItem)="userSelected($event)" [inputFormatter]="formatter" [ngbTypeahead]="search"
-               [resultFormatter]="formatter"
-               class="form-control"
-               id="typeahead-basic"
-               type="text"/>
+   <div class="container-fluid d-flex justify-content-center">
+      {{user.name!}}
+   </div>
+   <div class="h-100 d-flex flex-row container-fluid row w-100">
+      <div
+         class="col-4 overflow-auto no-scrollbar no-gutters border border-top-0 border-bottom-0 h-100 d-none d-sm-block">
+         <div class="row my-1 mx-2">
+            <input (selectItem)="userSelected($event)" [inputFormatter]="formatter" [ngbTypeahead]="search"
+                   [resultFormatter]="formatter"
+                   class="form-control"
+                   id="typeahead-basic"
+                   type="text"/>
+         </div>
+         <div>
+            <app-conversation (click)="changeConversation(conversation)"
+                              *ngFor="let conversation of user.conversations" [conversation]=conversation
+                              [user]="user"></app-conversation>
+         </div>
       </div>
-      <div>
-        <app-conversation (click)="changeConversation(conversation)"
-                          *ngFor="let conversation of user.conversations" [conversation]=conversation
-                          [user]="user"></app-conversation>
-      </div>
-    </div>
 
-    <div class="col h-100">
-      <div *ngIf="currentConversation === null" class="col overflow-auto no-scrollbar h-100">
-        <div class="row h-100 justify-content-center align-content-center">
-          Pas de conversation selectionné
-        </div>
-      </div>
-      <div *ngIf="currentConversation" class="h-100">
-        <div #scrollContainer class="col overflow-auto no-scrollbar" style="height: 83% !important;">
-          <app-message [currentConversation]="currentConversation" [user]="user"></app-message>
-        </div>
-        <div class="py-4 bg-white">
-          <div class="row mx-5">
-            <div class="col d-flex">
-              <label class="w-100">
-                <input #inputElement (keyup.enter)="sendMessage(inputElement)" class="form-control"
-                       placeholder="Entrer le message"
-                       type="text">
-              </label>
-              <button (click)="sendMessage(inputElement)" class="btn"><i class="material-icons">send</i></button>
+      <div class="col h-100">
+         <div *ngIf="currentConversation === null" class="col overflow-auto no-scrollbar h-100">
+            <div class="row h-100 justify-content-center align-content-center">
+               Pas de conversation selectionné
             </div>
-          </div>
-        </div>
+         </div>
+         <div *ngIf="currentConversation" class="h-100">
+            <div #scrollContainer class="col overflow-auto no-scrollbar" style="height: 83% !important;">
+               <app-message [currentConversation]="currentConversation" [user]="user"></app-message>
+            </div>
+            <div class="py-4 bg-white">
+               <div class="row mx-5">
+                  <div class="col d-flex">
+                     <label class="w-100">
+                        <input #inputElement (keyup.enter)="sendMessage(inputElement)" class="form-control"
+                               placeholder="Entrer le message"
+                               type="text">
+                     </label>
+                     <button (click)="sendMessage(inputElement)" class="btn"><i class="material-icons">send</i></button>
+                  </div>
+               </div>
+            </div>
+         </div>
       </div>
-    </div>
-  </div>
+   </div>
 </div>

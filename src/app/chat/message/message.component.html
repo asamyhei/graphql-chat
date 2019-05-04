@@ -1,11 +1,11 @@
 <div *ngFor="let message of currentConversation.messages" class="row mx-2">
-  <div [class.flex-row-reverse]="message.user.id === user.id"
-       [class.flex-row]="message.user.id != user.id"
-       class="col d-flex align-items-center bg-light my-2 py-2 rounded-pill">
-    <img [src]="message.user.picture_url" alt="profile_picture" style="border-radius: 50%">
-    <div>
-      <div [class.text-right]="message.user.id === user.id" class="mx-3">{{message.user.name}}:</div>
-      <div class="mx-3 font-weight-light">{{message.content}}</div>
-    </div>
-  </div>
+   <div [class.flex-row-reverse]="message.user.id === user.id"
+        [class.flex-row]="message.user.id != user.id"
+        class="col d-flex align-items-center bg-light my-2 py-2 rounded-pill">
+      <img [src]="message.user.picture_url" alt="profile_picture" style="border-radius: 50%">
+      <div>
+         <div [class.text-right]="message.user.id === user.id" class="mx-3">{{message.user.name}}:</div>
+         <div class="mx-3 font-weight-light">{{message.content}}</div>
+      </div>
+   </div>
 </div>

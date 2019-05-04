@@ -1,8 +1,8 @@
 .no-scrollbar {
-  scrollbar-width: none;
+   scrollbar-width: none;
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  /* This is the magic bit for WebKit */
-  display: none;
+   /* This is the magic bit for WebKit */
+   display: none;
 }

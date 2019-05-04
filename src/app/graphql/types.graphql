@@ -1,216 +1,216 @@
 mutation addUser($name: String!, $password: String!){
-  addUser(name: $name, password: $password) {
-    id
-    name
-    picture_url
-    conversations {
+   addUser(name: $name, password: $password) {
       id
-      timestamp
-      users {
-        id
-        name
+      name
+      picture_url
+      conversations {
+         id
+         timestamp
+         users {
+            id
+            name
+         }
       }
-    }
-  }
+   }
 }
 
 mutation addMessage($content: String!, $userId: ID!, $conversationId: ID!) {
-  addMessage(content: $content, userId: $userId, conversationId: $conversationId) {
-    id
-    content
-    timestamp
-    conversation {
+   addMessage(content: $content, userId: $userId, conversationId: $conversationId) {
+      id
+      content
       timestamp
-      id
-    }
-    user {
-      id
-      name
-      picture_url
-    }
-  }
+      conversation {
+         timestamp
+         id
+      }
+      user {
+         id
+         name
+         picture_url
+      }
+   }
 }
 
 mutation createConversation($userIds: [ID!]!) {
-  createConversation(userIds: $userIds) {
-    id
-    timestamp
-    messages {
-      content
-      id
-      timestamp
-      user {
-        id
-        name
-        picture_url
-      }
-    }
-    users {
-      id
-      name
-      picture_url
-    }
-  }
-}
-
-mutation addUserToConversation($userId: ID!, $conversationID: ID!) {
-  addUserToConversation(userId: $userId, conversationId: $conversationID) {
-    id
-    name
-  }
-}
-
-query conversationsByUser($userId: ID!) {
-  conversationsByUser(userId: $userId) {
-    id
-    timestamp
-    messages {
-      content
-      timestamp
-    }
-    users {
-      id
-      name
-    }
-  }
-}
-
-query conversationsByUsers($userIds: [ID!]!) {
-  conversationsByUsers(userIds: $userIds) {
-    id
-    timestamp
-    messages {
-      id
-      content
-      timestamp
-      user {
-        id
-        picture_url
-        name
-      }
-    }
-    users {
-      id
-      name
-      picture_url
-    }
-  }
-}
-
-query messages {
-  messages {
-    content
-    timestamp
-    user {
-      id
-      name
-      picture_url
-    }
-  }
-}
-
-query users {
-  users {
-    id
-    name
-  }
-}
-
-query user($id: ID!) {
-  user(id: $id) {
-    id
-    name
-    picture_url
-    conversations {
+   createConversation(userIds: $userIds) {
       id
       timestamp
       messages {
-        id
-        content
-        timestamp
-        user {
-          id
-          picture_url
-          name
-        }
+         content
+         id
+         timestamp
+         user {
+            id
+            name
+            picture_url
+         }
       }
       users {
-        id
-        name
-        picture_url
+         id
+         name
+         picture_url
       }
-    }
-  }
+   }
+}
+
+mutation addUserToConversation($userId: ID!, $conversationID: ID!) {
+   addUserToConversation(userId: $userId, conversationId: $conversationID) {
+      id
+      name
+   }
+}
+
+query conversationsByUser($userId: ID!) {
+   conversationsByUser(userId: $userId) {
+      id
+      timestamp
+      messages {
+         content
+         timestamp
+      }
+      users {
+         id
+         name
+      }
+   }
+}
+
+query conversationsByUsers($userIds: [ID!]!) {
+   conversationsByUsers(userIds: $userIds) {
+      id
+      timestamp
+      messages {
+         id
+         content
+         timestamp
+         user {
+            id
+            picture_url
+            name
+         }
+      }
+      users {
+         id
+         name
+         picture_url
+      }
+   }
+}
+
+query messages {
+   messages {
+      content
+      timestamp
+      user {
+         id
+         name
+         picture_url
+      }
+   }
+}
+
+query users {
+   users {
+      id
+      name
+   }
+}
+
+query user($id: ID!) {
+   user(id: $id) {
+      id
+      name
+      picture_url
+      conversations {
+         id
+         timestamp
+         messages {
+            id
+            content
+            timestamp
+            user {
+               id
+               picture_url
+               name
+            }
+         }
+         users {
+            id
+            name
+            picture_url
+         }
+      }
+   }
 }
 
 query conversation($id: ID!) {
-  conversation(id: $id) {
-    id
-    timestamp
-    messages {
-      content
+   conversation(id: $id) {
       id
       timestamp
-      user {
-        id
-        name
-        picture_url
+      messages {
+         content
+         id
+         timestamp
+         user {
+            id
+            name
+            picture_url
+         }
       }
-    }
-    users {
-      id
-      name
-      picture_url
-    }
-  }
+      users {
+         id
+         name
+         picture_url
+      }
+   }
 }
 
 subscription messageAdded{
-  messageAdded {
-    id
-    content
-    timestamp
-    user {
+   messageAdded {
       id
-      name
-      picture_url
-    }
-    conversation {
-      id
+      content
       timestamp
-      users {
-        id
+      user {
+         id
+         name
+         picture_url
       }
-    }
+      conversation {
+         id
+         timestamp
+         users {
+            id
+         }
+      }
 
-  }
+   }
 }
 
 subscription userJoined {
-  userConnected {
-    id
-    name
-    picture_url
-  }
-}
-
-subscription newConversation {
-  newConversation {
-    id
-    messages {
-      content
-      id
-      timestamp
-      user {
-        id
-        name
-        picture_url
-      }
-    }
-    users {
+   userConnected {
       id
       name
       picture_url
-    }
-  }
+   }
+}
+
+subscription newConversation {
+   newConversation {
+      id
+      messages {
+         content
+         id
+         timestamp
+         user {
+            id
+            name
+            picture_url
+         }
+      }
+      users {
+         id
+         name
+         picture_url
+      }
+   }
 }
