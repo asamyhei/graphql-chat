@@ -1,4 +1,4 @@
-<div *ngFor="let message of messagesArray" class="row mx-2">
+<div *ngFor="let message of currentConversation.messages" class="row mx-2">
   <div [class.flex-row-reverse]="message.user.id === user.id"
        [class.flex-row]="message.user.id != user.id"
        class="col d-flex align-items-center bg-light my-2 py-2 rounded-pill">

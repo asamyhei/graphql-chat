@@ -50,7 +50,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.conversationService.conversation.subscribe(conversation => {
       if (conversation) {
         console.log(conversation);
-        if (this.user.conversations.map(c => c.id).indexOf(conversation.id) <= -1 && conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
+        if (this.user.conversations.map(c => c.id).indexOf(conversation.id) <= -1
+          && conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
           this.user.conversations.unshift(conversation);
         }
         this.currentConversation = conversation;
@@ -59,9 +60,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
     this.messageService.newMessage.subscribe(message => {
       if (message) {
-        let convIndex = this.user.conversations.map(conv => conv.id).indexOf(message.conversation.id);
+        const convIndex = this.user.conversations.map(conv => conv.id).indexOf(message.conversation.id);
         if (convIndex > -1) {
           this.user.conversations[convIndex].messages.push(message);
+        }
+        if (message.conversation.id === this.currentConversation.id) {
+          this.currentConversation.messages = this.user.conversations[convIndex].messages;
         }
       }
     });

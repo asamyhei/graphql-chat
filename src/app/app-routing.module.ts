@@ -5,14 +5,14 @@ import {ChatComponent} from './chat/chat.component';
 import {AuthGuard} from './guards/auth.guard';
 
 const routes: Routes = [
-  {path: '', redirectTo: 'chat', pathMatch: 'full'},
-  {path: 'chat', component: ChatComponent, canActivate: [AuthGuard]},
-  {path: 'login', component: LoginComponent},
+   {path: '', redirectTo: 'chat', pathMatch: 'full'},
+   {path: 'chat', component: ChatComponent, canActivate: [AuthGuard]},
+   {path: 'login', component: LoginComponent},
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+   imports: [RouterModule.forRoot(routes)],
+   exports: [RouterModule]
 })
 export class AppRoutingModule {
 }

@@ -17,26 +17,26 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {UserService} from './service/user.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    MessageComponent,
-    LoginComponent,
-    ChatComponent,
-    ConversationComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    GraphqlModule,
-    HttpClientModule,
-    BrowserAnimationsModule,
-    ScrollingModule,
-    ExperimentalScrollingModule,
-    ReactiveFormsModule,
-    NgbModule
-  ],
-  providers: [UserService],
-  bootstrap: [AppComponent]
+   declarations: [
+      AppComponent,
+      MessageComponent,
+      LoginComponent,
+      ChatComponent,
+      ConversationComponent
+   ],
+   imports: [
+      BrowserModule,
+      AppRoutingModule,
+      GraphqlModule,
+      HttpClientModule,
+      BrowserAnimationsModule,
+      ScrollingModule,
+      ExperimentalScrollingModule,
+      ReactiveFormsModule,
+      NgbModule
+   ],
+   providers: [UserService],
+   bootstrap: [AppComponent]
 })
 export class AppModule {
 }

@@ -17,7 +17,7 @@ app.use(cors());
 mongoose.connect(uri);
 
 mongoose.connection.once("open", () => {
-  console.log("connection open");
+   console.log("connection open");
 });
 
 // Serve only the static files form the dist directory
@@ -25,22 +25,22 @@ app.use(express.static(__dirname + "/dist/graphql-chat"));
 
 app.use("/graphql", graphqlHttp({schema: schema, graphiql: true}));
 
-app.get("/*", function(req, res) {
-  res.sendFile(path.join(__dirname + "/dist/graphql-chat/index.html"));
+app.get("/*", function (req, res) {
+   res.sendFile(path.join(__dirname + "/dist/graphql-chat/index.html"));
 });
 
 // Start the app by listening on the default Heroku port
 const ws = createServer(app);
 ws.listen(process.env.PORT || 8080, () => {
-  console.log(`GraphQL Server is now running on http://localhost:${process.env.PORT || 8080}`);
+   console.log(`GraphQL Server is now running on http://localhost:${process.env.PORT || 8080}`);
 
-  // Set up the WebSocket for handling GraphQL subscriptions.
-  new SubscriptionServer({
-    execute,
-    schema: schema,
-    subscribe,
-  }, {
-    path: "/graphql",
-    server: ws,
-  });
+   // Set up the WebSocket for handling GraphQL subscriptions.
+   new SubscriptionServer({
+      execute,
+      schema: schema,
+      subscribe,
+   }, {
+      path: "/graphql",
+      server: ws,
+   });
 });
