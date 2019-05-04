@@ -49,12 +49,12 @@ export class ChatComponent implements OnInit, AfterViewChecked {
 
       this.conversationService.conversation.subscribe(conversation => {
          if (conversation) {
-            console.log(conversation);
             if (this.user.conversations.map(c => c.id).indexOf(conversation.id) <= -1
                && conversation.users.map(u => u.id).indexOf(this.user.id) > -1) {
                this.user.conversations.unshift(conversation);
+            } else {
+               this.currentConversation = conversation;
             }
-            this.currentConversation = conversation;
          }
       });
 

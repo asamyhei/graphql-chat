@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject} from 'rxjs';
 import {Conversation, CreateConversationGQL, NewConversationGQL} from '../graphql/generated/graphql';
 import {first, map} from 'rxjs/operators';
+import {UserService} from './user.service';
 
 @Injectable({
    providedIn: 'root'
@@ -14,7 +15,9 @@ export class ConversationService {
    private newConversationSubject: BehaviorSubject<Conversation> = new BehaviorSubject(null);
    newConversation = this.newConversationSubject.asObservable();
 
-   constructor(private newConversationGQL: NewConversationGQL, private createConversationGQL: CreateConversationGQL) {
+   constructor(private newConversationGQL: NewConversationGQL,
+               private createConversationGQL: CreateConversationGQL) {
+
       this.newConversationGQL.subscribe()
          .pipe(map(response => response.data.newConversation), first())
          .subscribe((conversation: Conversation) => {

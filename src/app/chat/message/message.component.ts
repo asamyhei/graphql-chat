@@ -6,7 +6,7 @@ import {Conversation, User} from '../../graphql/generated/graphql';
    templateUrl: './message.component.html',
    styleUrls: ['./message.component.scss']
 })
-export class MessageComponent implements OnInit, OnChanges {
+export class MessageComponent implements OnInit {
 
    userId: string = sessionStorage.getItem('userId');
    @Input() user: User;
@@ -17,10 +17,6 @@ export class MessageComponent implements OnInit, OnChanges {
    }
 
    ngOnInit() {
-      console.log('init');
    }
 
-   ngOnChanges(changes: SimpleChanges): void {
-      console.log(changes);
-   }
 }

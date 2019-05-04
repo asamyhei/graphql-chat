@@ -1,5 +1,5 @@
 <div *ngIf="user && conversation" class="row" style="cursor: pointer">
-   <div class="col d-flex align-items-center py-2 border border-bottom-0 border-right-0 flex-row">
+   <div class="col d-flex align-items-center py-2 border border-bottom-0 border-right-0 flex-row" [class.selected]="selectedConv.id === conversation.id">
       <img [src]="otherUser.picture_url" alt="profile_picture" style="border-radius: 50%">
       <div>
          <div class="mx-3">{{otherUser.name}}</div>

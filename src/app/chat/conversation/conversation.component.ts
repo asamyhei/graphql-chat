@@ -1,5 +1,6 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {Conversation, User, UserGQL} from '../../graphql/generated/graphql';
+import {Conversation, User} from '../../graphql/generated/graphql';
+import {ConversationService} from '../../service/conversation.service';
 
 @Component({
    selector: 'app-conversation',
@@ -11,8 +12,10 @@ export class ConversationComponent implements OnInit, OnChanges {
    @Input() user: User;
    @Input() conversation: Conversation;
    otherUser: User;
+   selectedConv: Conversation;
 
-   constructor(private userGQL: UserGQL) {
+   constructor(private conversationService: ConversationService) {
+      this.conversationService.conversation.subscribe(conv => this.selectedConv = conv);
    }
 
    ngOnInit() {
