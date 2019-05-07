@@ -8,6 +8,7 @@ import {split} from 'apollo-link';
 
 import {WebSocketLink} from 'apollo-link-ws';
 import {getMainDefinition} from 'apollo-utilities';
+import {environment} from '../../environments/environment';
 
 @NgModule({
    exports: [HttpClientModule, ApolloModule, HttpLinkModule]
@@ -15,12 +16,12 @@ import {getMainDefinition} from 'apollo-utilities';
 export class GraphqlModule {
    constructor(apollo: Apollo, private httpClient: HttpClient) {
       const httpLink = new HttpLink(httpClient).create({
-         uri: 'http://localhost:8080/graphql',
+         uri: environment.uri_http,
       });
 
       const subscriptionLink = new WebSocketLink({
          uri:
-            'ws://localhost:8080/graphql',
+            environment.uri_ws,
          options: {
             reconnect: true,
             connectionParams: {
